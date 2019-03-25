@@ -753,6 +753,9 @@
 #define IPC_SEMCTL	(IPC_BASE+6)
 #define IPC_SEMOP	(IPC_BASE+7)
 
+/* Messages */
+#define IPC_PRINTMESSAGE (IPC_BASE+8)
+
 /*===========================================================================*
  *                Messages for Scheduling				     *
  *===========================================================================*/
