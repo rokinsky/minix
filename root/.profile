@@ -9,13 +9,6 @@ export PAGER=less
 # aliases
 alias ls="ls -l"
 
-# frends' secret
-if [ ! -d "/tmp/secret" ]; then
-  mkdir /tmp/secret
-  chgrp friends /tmp/secret
-  chmod 770 /tmp/secret
-fi
-
 # Let cd display the current directory on the status line.
 if [ -t 0 -a -f /usr/bin/tget ] && tget -flag hs
 then
