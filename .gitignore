@@ -1,2 +1,9 @@
-minix*
-test*
+minix.img
+minix-copy.img
+minix-image.sh
+minix-mount.sh
+minix-repair.sh
+minix-run.sh
+minix-tips.txt
+test-bash.sh
+test-expect.sh
