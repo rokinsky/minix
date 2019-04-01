@@ -4,7 +4,7 @@
 .PATH: ${ARCHDIR}/misc ${.CURDIR}/misc
 
 # constructor
-SRCS+=	initfini.c
+SRCS+=	initfini.c distort_time.c
 
 # for -fstack-protector
 SRCS+=	stack_protector.c
