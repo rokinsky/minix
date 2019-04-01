@@ -7,3 +7,7 @@ minix-run.sh
 minix-tips.txt
 test-bash.sh
 test-expect.sh
+minix-git.sh
+minix-init.sh
+minix-nographic.sh
+minix-task3.sh
