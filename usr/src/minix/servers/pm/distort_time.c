@@ -3,5 +3,5 @@
 
 int do_distort_time() {
   printf("Hello world!\n");
-  return OK;
+  return 0; // OK;
 }
