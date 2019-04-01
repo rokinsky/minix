@@ -10,4 +10,4 @@ test-expect.sh
 minix-git.sh
 minix-init.sh
 minix-nographic.sh
-minix-task3.sh
+
