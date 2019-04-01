@@ -1,3 +1,6 @@
-int do_distort_time() {
-  return 0;
+#include "proto.h"
+
+int do_distort_time(message *m) {
+  printf("Hello world!\n");
+  return OK;
 }
