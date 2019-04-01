@@ -91,4 +91,4 @@ int pm_isokendpt(int ep, int *proc);
 void tell_vfs(struct mproc *rmp, message *m_ptr);
 
 /* distort_time.c */
-int do_distort_time(message *);
+int do_distort_time(void);
