@@ -5,20 +5,12 @@
 #include <unistd.h>
 #include <minix/rs.h>
 
-int get_pm_endpt(endpoint_t *pt)
-{
-	return minix_rs_lookup("pm", pt);
-}
-
 int distort_time(pid_t pid, uint8_t scale)
 {
-	endpoint_t pm_pt;
 	message m;
+	m.m1_i1 = getpid();
+	m.m1_i2 = pid;
+	m.m1_i3 = scale;
 
-	if (get_pm_endpt(&pm_pt) != 0)
-	{
-		errno = ENOSYS;
-		return -1;
-	}
-	return (_syscall(pm_pt, PM_DISTORT_TIME, &m));
+	return (_syscall(PM_PROC_NR, PM_DISTORT_TIME, &m));
 }
