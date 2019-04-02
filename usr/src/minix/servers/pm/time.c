@@ -6,6 +6,7 @@
  *   do_settime:	perform the CLOCK_SETTIME system call
  *   do_time:		perform the GETTIMEOFDAY system call
  *   do_stime:		perform the STIME system call
+ *   do_distort_time: perform the DISTORT_TIME system call
  */
 
 #include "pm.h"
@@ -141,18 +142,61 @@ int do_stime()
 /*===========================================================================*
  *				do_distort_time				*
  *===========================================================================*/
-int do_distort_time() {
-  /*
-   * TODO: Set in table mproc[conternder] information about distort's scale
-   * if `contender` doesn't exists, then `return EINVAL`
-   * if `caller` == `contender`, then `return EPERM`
-   * if `caller` isn't child (parent) of `contender`, then `return EPERM`
-   * if `scale == 0`, then time stops for `contender`.
-   */
-  pid_t caller = m_in.m1_i1;
-  pid_t contender = m_in.m1_i2;
-  uint8_t scale = m_in.m1_i3;
+typedef struct {
+  int id;
+  pid_t pid;
+  int parent_id;
+} process;
 
-  printf("distort_time: caller(%d), (%d, %d).\n", caller, contender, scale);
+static void find_mprocs(process* caller, process* target) {
+  caller->id = target->id = -1;
+  for (int i = 0; i < NR_PROCS; i++) {
+    struct mproc proc = mproc[i];
+
+    if (caller->pid == proc.mp_pid) {
+      caller->id = i;
+      caller->parent_id = proc.mp_parent;
+    }
+    if (target->pid == proc.mp_pid) {
+      target->id = i;
+      target->parent_id = proc.mp_parent;
+    }
+  }
+}
+
+static int is_ancestor(process candidate, process descendant) {
+  struct mproc proc = mproc[descendant.parent_id]; 
+
+  /* init is the ancestor of every other process in the system */
+  while (proc.pid != 1) {
+    if (proc.pid == candidate.pid)
+      return 1;
+    proc = mproc[proc.mp_parent]);
+  }
+
+  return 0;
+}
+
+int do_distort_time() {
+  process caller = { .pid = m_in.m1_i1 };
+  process target = { .pid = m_in.m1_i2 };
+  uint8_t scale = m_in.m1_i3;
+  printf("distort_time: caller(%d), (%d, %d).\n", caller, target, scale);
+
+  find_mprocs(&caller, &target);
+  if (target.id < 0) 
+    return EINVAL;
+  else if (caller.id == target.id) 
+    return EPERM;
+
+  int is_antecedent = is_ancestor(caller, target);
+  int is_descendant = is_ancestor(target, caller);
+
+  if (!is_descendant && !is_antecedent)
+    return EPERM;
+
+  float* p_scale = &mproc[caller.id].mp_child_scale;
+  *p_scale = scale > 0 ? (is_antecedent ? scale : (float) 1 / scale) : 0;
+
   return OK;
 }
