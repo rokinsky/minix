@@ -67,6 +67,7 @@ int do_getres()
  *===========================================================================*/
 int do_settime()
 {
+  /* TODO: reset distort time for all processes */
   int s;
 
   if (mp->mp_effuid != SUPER_USER) { 
@@ -94,6 +95,10 @@ int do_time()
  * rotates at a constant rate and that such things as leap seconds do not 
  * exist.
  */
+  /* 
+   * TODO: first call - start to distort time (?), 
+   * for each next - print process's distorted time  
+   */
   clock_t ticks, realtime;
   time_t boottime;
   int s;
@@ -137,6 +142,13 @@ int do_stime()
  *				do_distort_time				*
  *===========================================================================*/
 int do_distort_time() {
+  /*
+   * TODO: Set in table mproc[conternder] information about distort's scale
+   * if `contender` doesn't exists, then `return EINVAL`
+   * if `caller` == `contender`, then `return EPERM`
+   * if `caller` isn't child (parent) of `contender`, then `return EPERM`
+   * if `scale == 0`, then time stops for `contender`.
+   */
   pid_t caller = m_in.m1_i1;
   pid_t contender = m_in.m1_i2;
   uint8_t scale = m_in.m1_i3;
