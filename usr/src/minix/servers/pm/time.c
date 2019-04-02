@@ -168,10 +168,10 @@ static int is_ancestor(process candidate, process descendant) {
   struct mproc proc = mproc[descendant.parent_id]; 
 
   /* init is the ancestor of every other process in the system */
-  while (proc.pid != 1) {
-    if (proc.pid == candidate.pid)
+  while (proc.mp_pid != 1) {
+    if (proc.mp_pid == candidate.pid)
       return 1;
-    proc = mproc[proc.mp_parent]);
+    proc = mproc[proc.mp_parent];
   }
 
   return 0;
@@ -181,7 +181,7 @@ int do_distort_time() {
   process caller = { .pid = m_in.m1_i1 };
   process target = { .pid = m_in.m1_i2 };
   uint8_t scale = m_in.m1_i3;
-  printf("distort_time: caller(%d), (%d, %d).\n", caller, target, scale);
+  printf("distort_time: caller(%d), (%d, %d).\n", caller.pid, target.pid, scale);
 
   find_mprocs(&caller, &target);
   if (target.id < 0) 
