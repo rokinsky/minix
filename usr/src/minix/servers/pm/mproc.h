@@ -26,7 +26,6 @@ EXTERN struct mproc {
   /* Child user and system times. Accounting done on child exit. */
   clock_t mp_child_utime;	/* cumulative user time of children */
   clock_t mp_child_stime;	/* cumulative sys time of children */
-  //float mp_child_scale;	/* scale result of distort */
 
   /* Real and effective uids and gids. */
   uid_t mp_realuid;		/* process' real uid */
@@ -71,6 +70,8 @@ EXTERN struct mproc {
   char mp_name[PROC_NAME_LEN];	/* process name */
 
   int mp_magic;			/* sanity check, MP_MAGIC */
+
+  float mp_scale;		/* scale result of distort */
 } mproc[NR_PROCS];
 
 /* Flag values */
