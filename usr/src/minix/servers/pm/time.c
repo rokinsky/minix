@@ -184,8 +184,8 @@ static void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt)
   if (mp->mp_time_is_distorted > 0) {
 
   } else {
-    time->sec = now.sec;
-    time->nsec = now.nsec;
+    time->sec = now.tv_sec;
+    time->nsec = now.tv_nsec;
   }
 }
 
