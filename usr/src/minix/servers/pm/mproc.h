@@ -71,7 +71,8 @@ EXTERN struct mproc {
 
   int mp_magic;			/* sanity check, MP_MAGIC */
 
-  float mp_scale;		/* scale result of distort */
+  float mp_time_scale;		/* scale result of distort */
+  clock_t mp_time_benchmark;	/* reference point of distorted time */
 } mproc[NR_PROCS];
 
 /* Flag values */
