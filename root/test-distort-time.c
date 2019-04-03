@@ -2,6 +2,7 @@
 #include <lib.h>
 #include <errno.h>
 #include <stdio.h>
+#include <assert.h>
 
 int main(int argc, char** argv)
 {
