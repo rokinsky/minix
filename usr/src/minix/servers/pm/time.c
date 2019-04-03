@@ -176,8 +176,17 @@ static void reset_time_perception()
 static void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt)
 {
   pid_t pid = mp->mp_pid;
-  time->sec = bt + (rt / system_hz);
-  time->nsec = (uint32_t) ((rt % system_hz) * 1000000000ULL / system_hz);
+  struct timeval now = { 
+    .sec = bt + (rt / system_hz),
+    .nsec = (uint32_t) ((rt % system_hz) * 1000000000ULL / system_hz),
+  };
+
+  if (mp->mp_time_is_distorted > 0) {
+
+  } else {
+    time->sec = now.sec;
+    time->nsec = now.nsec;
+  }
 }
 
 static int is_ancestor(process candidate, process descendant)
