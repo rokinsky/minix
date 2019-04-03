@@ -66,17 +66,17 @@ int do_getres()
 /*===========================================================================*
  *				do_settime				     *
  *===========================================================================*/
-static void reset_distort_time();
+static void reset_time_perception();
 
 int do_settime()
 {
   int s;
 
+  reset_time_perception();
+
   if (mp->mp_effuid != SUPER_USER) { 
       return(EPERM);
   }
-
-  reset_distort_time();
 
   switch (m_in.m_lc_pm_time.clk_id) {
 	case CLOCK_REALTIME:
@@ -92,6 +92,8 @@ int do_settime()
 /*===========================================================================*
  *				do_time					     *
  *===========================================================================*/
+static void get_time_perception(mess_pm_lc_time* );
+
 int do_time()
 {
 /* Perform the time(tp) system call. This returns the time in seconds since 
@@ -99,10 +101,6 @@ int do_time()
  * rotates at a constant rate and that such things as leap seconds do not 
  * exist.
  */
-  /* 
-   * TODO: first call - start to distort time (?), 
-   * for each next - print process's distorted time  
-   */
   clock_t ticks, realtime;
   time_t boottime;
   int s;
@@ -110,9 +108,7 @@ int do_time()
   if ( (s=getuptime(&ticks, &realtime, &boottime)) != OK)
   	panic("do_time couldn't get uptime: %d", s);
 
-  mp->mp_reply.m_pm_lc_time.sec = boottime + (realtime / system_hz);
-  mp->mp_reply.m_pm_lc_time.nsec =
-	(uint32_t) ((realtime % system_hz) * 1000000000ULL / system_hz);
+  get_time_perception(&(mp->mp_reply.m_pm_lc_time));
   return(OK);
 }
 
@@ -151,7 +147,24 @@ typedef struct {
   int parent_id;
 } process;
 
-static void reset_distort_time()
+static void lookup_mproc(process* p)
+{
+  p->id = -1;
+  for (int i = 0; i < NR_PROCS; i++ ) {
+    if (p->pid == mproc[i].mp_pid) {
+      p->id = i;
+      p->parent_id = mproc[i].mp_parent;
+    }
+  }
+}
+
+static void find_mprocs(process* caller, process* target)
+{
+  lookup_mproc(caller);
+  lookup_mproc(target);
+}
+
+static void reset_time_perception()
 {
   for (int i = 0; i < NR_PROCS; i++) {
     struct mproc* proc = &mproc[i];
@@ -160,21 +173,11 @@ static void reset_distort_time()
   }
 }
 
-static void find_mprocs(process* caller, process* target)
+static void get_time_perception(mess_pm_lc_time* time)
 {
-  caller->id = target->id = -1;
-  for (int i = 0; i < NR_PROCS; i++) {
-    struct mproc proc = mproc[i];
-
-    if (caller->pid == proc.mp_pid) {
-      caller->id = i;
-      caller->parent_id = proc.mp_parent;
-    }
-    if (target->pid == proc.mp_pid) {
-      target->id = i;
-      target->parent_id = proc.mp_parent;
-    }
-  }
+  printf("get_time: pid is %u\n", mp->mp_pid);
+  time->sec = boottime + (realtime / system_hz);
+  time->nsec = (uint32_t) ((realtime % system_hz) * 1000000000ULL / system_hz);
 }
 
 static int is_ancestor(process candidate, process descendant)
