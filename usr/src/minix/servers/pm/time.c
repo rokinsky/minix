@@ -168,8 +168,8 @@ static void reset_time_perception()
 {
   for (int i = 0; i < NR_PROCS; i++) {
     struct mproc* proc = &mproc[i];
-    proc->mp_time_is_distorted = 0;
-    proc->mp_time_scale = 0;
+  //  proc->mp_time_is_distorted = 0;
+  //  proc->mp_time_scale = 0;
   }
 }
 
@@ -181,12 +181,12 @@ static void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt)
     .tv_nsec = (uint32_t) ((rt % system_hz) * 1000000000ULL / system_hz),
   };
 
-  if (mp->mp_time_is_distorted > 0) {
+  //if (mp->mp_time_is_distorted > 0) {
 
-  } else {
+  //} else {
     time->sec = now.tv_sec;
     time->nsec = now.tv_nsec;
-  }
+  //}
 }
 
 static int is_ancestor(process candidate, process descendant)
@@ -227,10 +227,10 @@ int do_distort_time()
   if (!is_descendant && !is_antecedent)
     return EPERM;
 
-  float* p_scale = &mproc[target.id].mp_time_scale;
-  *p_scale = scale > 0 ? (is_antecedent ? scale : (float) 1 / scale) : 0;
+  //float* p_scale = &mproc[target.id].mp_time_scale;
+  //*p_scale = scale > 0 ? (is_antecedent ? scale : (float) 1 / scale) : 0;
 
-  mproc[target.id].mp_time_is_distorted = *p_scale != 1;
+  //mproc[target.id].mp_time_is_distorted = *p_scale != 1;
 
   return OK;
 }

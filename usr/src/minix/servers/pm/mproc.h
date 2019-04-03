@@ -72,9 +72,9 @@ EXTERN struct mproc {
   int mp_magic;			/* sanity check, MP_MAGIC */
 
   /* Process time perception */
-  int mp_time_is_distorted;	/* flag, default 0 */
   struct timespec mp_time_test;	/* reference point of distorted time */
-  float mp_time_scale;		/* scale result of distort */
+  //int mp_time_is_distorted;	/* flag, default 0 */
+  //float mp_time_scale;		/* scale result of distort */
 } mproc[NR_PROCS];
 
 /* Flag values */
