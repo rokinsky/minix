@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <minix/rs.h>
+#include <errno.h>
 
 int distort_time(pid_t pid, uint8_t scale)
 {
@@ -12,5 +13,5 @@ int distort_time(pid_t pid, uint8_t scale)
 	m.m1_i2 = pid;
 	m.m1_i3 = scale;
 
-	return (_syscall(PM_PROC_NR, PM_DISTORT_TIME, &m));
+	return (_syscall(PM_PROC_NR, PM_DISTORT_TIME, &m)) == 0 ? 0 : errno;
 }
