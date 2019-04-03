@@ -66,14 +66,17 @@ int do_getres()
 /*===========================================================================*
  *				do_settime				     *
  *===========================================================================*/
+static void reset_distort_time();
+
 int do_settime()
 {
-  /* TODO: reset distort time for all processes */
   int s;
 
   if (mp->mp_effuid != SUPER_USER) { 
       return(EPERM);
   }
+
+  reset_distort_time();
 
   switch (m_in.m_lc_pm_time.clk_id) {
 	case CLOCK_REALTIME:
@@ -147,6 +150,15 @@ typedef struct {
   pid_t pid;
   int parent_id;
 } process;
+
+static void reset_distort_time()
+{
+  for (int i = 0; i < NR_PROCS; i++) {
+    struct mproc* proc = &mproc[i];
+    proc->mp_time_is_distorted = 0;
+    proc->mp_time_scale = 0;
+  }
+}
 
 static void find_mprocs(process* caller, process* target)
 {
