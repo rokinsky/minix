@@ -52,6 +52,7 @@ EXTERN struct mproc {
   vir_bytes mp_sigreturn; 	/* address of C library __sigreturn function */
   minix_timer_t mp_timer;	/* watchdog timer for alarm(2), setitimer(2) */
   clock_t mp_interval[NR_ITIMERS];	/* setitimer(2) repetition intervals */
+  /* here clock_t */
 
   unsigned mp_flags;		/* flag bits */
   unsigned mp_trace_flags;	/* trace options */
@@ -72,7 +73,8 @@ EXTERN struct mproc {
   int mp_magic;			/* sanity check, MP_MAGIC */
 
   /* Process time perception */
-  struct timespec mp_time_test;	/* reference point of distorted time */
+  uint8_t test[16];
+  //struct timespec mp_time_test;	/* reference point of distorted time */
   //int mp_time_is_distorted;	/* flag, default 0 */
   //float mp_time_scale;		/* scale result of distort */
 } mproc[NR_PROCS];
