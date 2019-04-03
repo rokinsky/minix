@@ -148,7 +148,8 @@ typedef struct {
   int parent_id;
 } process;
 
-static void find_mprocs(process* caller, process* target) {
+static void find_mprocs(process* caller, process* target)
+{
   caller->id = target->id = -1;
   for (int i = 0; i < NR_PROCS; i++) {
     struct mproc proc = mproc[i];
@@ -164,12 +165,16 @@ static void find_mprocs(process* caller, process* target) {
   }
 }
 
-static int is_ancestor(process candidate, process descendant) {
+static int is_ancestor(process candidate, process descendant)
+{
   struct mproc proc = mproc[descendant.parent_id]; 
 
   /* init is the ancestor of every other process in the system */
+  if (candidate.pid == 1)
+    return 1;
+
   while (proc.mp_pid != 1) {
-    if (proc.mp_pid == candidate.pid)
+    if (candidate.pid == proc.mp_pid)
       return 1;
     proc = mproc[proc.mp_parent];
   }
@@ -177,7 +182,8 @@ static int is_ancestor(process candidate, process descendant) {
   return 0;
 }
 
-int do_distort_time() {
+int do_distort_time()
+{
   process caller = { .pid = m_in.m1_i1 };
   process target = { .pid = m_in.m1_i2 };
   uint8_t scale = m_in.m1_i3;
