@@ -92,7 +92,7 @@ int do_settime()
 /*===========================================================================*
  *				do_time					     *
  *===========================================================================*/
-static void get_time_perception(mess_pm_lc_time* );
+static void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt);
 
 int do_time()
 {
@@ -108,7 +108,7 @@ int do_time()
   if ( (s=getuptime(&ticks, &realtime, &boottime)) != OK)
   	panic("do_time couldn't get uptime: %d", s);
 
-  get_time_perception(&(mp->mp_reply.m_pm_lc_time));
+  get_time_perception(&(mp->mp_reply.m_pm_lc_time), realtime, boottime);
   return(OK);
 }
 
@@ -173,11 +173,11 @@ static void reset_time_perception()
   }
 }
 
-static void get_time_perception(mess_pm_lc_time* time)
+static void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt)
 {
-  printf("get_time: pid is %u\n", mp->mp_pid);
-  time->sec = boottime + (realtime / system_hz);
-  time->nsec = (uint32_t) ((realtime % system_hz) * 1000000000ULL / system_hz);
+  pid_t pid = mp->mp_pid;
+  time->sec = bt + (rt / system_hz);
+  time->nsec = (uint32_t) ((rt % system_hz) * 1000000000ULL / system_hz);
 }
 
 static int is_ancestor(process candidate, process descendant)
