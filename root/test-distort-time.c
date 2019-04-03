@@ -13,6 +13,7 @@ void print_time(struct timeval tv) {
 	nowtm = localtime(&nowtime);
 	strftime(tmbuf, sizeof tmbuf, "%Y-%m-%d %H:%M:%S", nowtm);
 	snprintf(buf, sizeof buf, "%s.%06ld", tmbuf, tv.tv_usec);
+	printf("%s\n", buf);
 }
 
 int main(int argc, char** argv)
