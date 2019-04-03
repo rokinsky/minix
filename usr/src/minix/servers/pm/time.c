@@ -195,8 +195,8 @@ int do_distort_time() {
   if (!is_descendant && !is_antecedent)
     return EPERM;
 
-  float* p_scale = &mproc[caller.id].mp_child_scale;
-  *p_scale = scale > 0 ? (is_antecedent ? scale : (float) 1 / scale) : 0;
+  // float* p_scale = &mproc[caller.id].mp_child_scale;
+  // *p_scale = scale > 0 ? (is_antecedent ? scale : (float) 1 / scale) : 0;
 
   return OK;
 }
