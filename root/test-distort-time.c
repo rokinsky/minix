@@ -12,8 +12,8 @@ void print_time(struct timeval tv) {
 	nowtime = tv.tv_sec;
 	nowtm = localtime(&nowtime);
 	strftime(tmbuf, sizeof tmbuf, "%Y-%m-%d %H:%M:%S", nowtm);
-	snprintf(buf, sizeof buf, "%s.%06ld", tmbuf, tv.tv_usec);
-	printf("%s\n", buf);
+	snprintf(buf, sizeof buf, "%s.%06ld", tmbuf, (long) tv.tv_usec);
+	printf("%u: %s\n", getpid(), buf);
 }
 
 int main(int argc, char** argv)

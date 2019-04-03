@@ -199,7 +199,6 @@ int do_distort_time()
   process caller = { .pid = m_in.m1_i1 };
   process target = { .pid = m_in.m1_i2 };
   uint8_t scale = m_in.m1_i3;
-  printf("distort_time: caller(%d), (%d, %d).\n", caller.pid, target.pid, scale);
 
   find_mprocs(&caller, &target);
   if (target.id < 0) 
@@ -207,14 +206,19 @@ int do_distort_time()
   else if (caller.id == target.id) 
     return EPERM;
 
+  printf("distort_time: caller - (%d), (id %d, par %d).\n", caller.pid, caller.id, caller.parent_id);
+  printf("distort_time: target - (%d), (id %d, par %d).\n", target.pid, target.id, target.parent_id);
+
   int is_antecedent = is_ancestor(caller, target);
   int is_descendant = is_ancestor(target, caller);
 
   if (!is_descendant && !is_antecedent)
     return EPERM;
 
-  // float* p_scale = &mproc[caller.id].mp_child_scale;
-  // *p_scale = scale > 0 ? (is_antecedent ? scale : (float) 1 / scale) : 0;
+  float* p_scale = &mproc[target.id].mp_time_scale;
+  *p_scale = scale > 0 ? (is_antecedent ? scale : (float) 1 / scale) : 0;
+
+  mproc[target.id].mp_time_is_distorted = *p_scale != 1;
 
   return OK;
 }
