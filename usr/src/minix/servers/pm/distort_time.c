@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include "mproc.h"
 #include "pm.h"
+#include "proto.h"
 
 #define DT_NORMAL     0
 #define DT_DISTORTED  1
@@ -62,7 +63,7 @@ static void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt)
   float scale = (float) mp->mp_dt_scale;
 
   if (DT_CHECK(flag, DT_DISTORTED) && scale != 1) {
-    if (!DT_CHECK(flag, DT_BENCHMARK) {
+    if (!DT_CHECK(flag, DT_BENCHMARK)) {
       mp->mp_dt_flag |= DT_BENCHMARK;
       mp->mp_dt_benchmark = now;
     } else if (scale == 0) {
