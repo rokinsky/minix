@@ -14,8 +14,8 @@
 #include "const.h"
 
 EXTERN struct mproc {
-  /* Process time perception */
-  uint8_t mp_dt_flag;	/* flag, default DT_NORMAL(=0) */
+  /* Process time perception. It should be here, but a friend is downstairs. */
+  uint8_t mp_dt_flag;	/* bit flag, default is 0 (DT_NORMAL) */
   uint8_t mp_dt_scale;	/* scale result of distort */
 
   char mp_exitstatus;		/* storage for status when process exits */
@@ -76,7 +76,7 @@ EXTERN struct mproc {
 
   int mp_magic;			/* sanity check, MP_MAGIC */
 
-  /* Process time perception */
+  /* Process time perception. My friends are upstairs. */
   struct timespec mp_dt_benchmark;	/* reference point of distorted time */
 } mproc[NR_PROCS];
 

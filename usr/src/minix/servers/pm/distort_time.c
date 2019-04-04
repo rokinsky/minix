@@ -1,26 +1,27 @@
-/* This file takes care of those system calls that deal with time.
+/*===========================================================================*
+ * This file takes care of system call that deal with distort time.
  *
- * The entry points into this file are
+ * The entry points into this file is
  *   do_distort_time: perform the DISTORT_TIME system call
- */
+ *===========================================================================*/
 
 #include <stdbool.h>
 #include "pm.h"
 #include "mproc.h"
 #include "proto.h"
 
-#define DT_NORMAL     0
-#define DT_DISTORTED  1
-#define DT_BENCHMARK  2
+/* Brackets are never redundant here, states are below. */
+#define DT_CHECK(flag, state) (((flag) & (state)) == (state))
 
+#define DT_NORMAL     0 /* Everything is as usual. */
+#define DT_DISTORTED  1 /* Someone has distorted, but there is no benchmark. */
+#define DT_BENCHMARK  2 /* Benchmark is already there. */
+
+/* From whom in the family tree got distorted. */
 #define DT_ANTECEDENT 4
 #define DT_DESCENDANT 8
 
-#define DT_CHECK(flag,state) (((flag) & (state)) == (state))
-
-/*===========================================================================*
- *				do_distort_time				*
- *===========================================================================*/
+/* Unnecessary structure, but it's comfortable. */
 typedef struct {
   int id;
   pid_t pid;
@@ -40,6 +41,7 @@ static void lookup_mproc(process* p)
 
 static void find_mprocs(process* caller, process* target)
 {
+  /* I know that O(N) is better than O(2 * N) */
   lookup_mproc(caller);
   lookup_mproc(target);
 }
@@ -52,7 +54,7 @@ extern void reset_time_perception()
 
 extern void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt)
 {
-  pid_t pid = mp->mp_pid;
+  /* Beauty is not important. */
   struct timespec now = { 
     .tv_sec = bt + (rt / system_hz),
     .tv_nsec = (uint32_t) ((rt % system_hz) * 1000000000ULL / system_hz),
@@ -64,15 +66,20 @@ extern void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt)
 
   if (DT_CHECK(flag, DT_DISTORTED) && scale != 1) {
     if (!DT_CHECK(flag, DT_BENCHMARK)) {
+      /* Set the starting point. */
       mp->mp_dt_flag |= DT_BENCHMARK;
       mp->mp_dt_benchmark = now;
     } else if (scale == 0) {
+      /* Time is frozen. */
       res = bm;
     } else {
+      /* Let's distort! */
       bool is_antecedent = DT_CHECK(flag, DT_ANTECEDENT); 
-      scale = is_antecedent ? (float) 1 / scale : scale;
+      scale = is_antecedent ? scale : (float) 1 / scale;
+      /* Almost correct result... */
       res.tv_sec = bm.tv_sec + (now.tv_sec - bm.tv_sec) * scale;
       res.tv_nsec = bm.tv_nsec + (now.tv_nsec - bm.tv_nsec) * scale;
+      /* TODO: better accuracy if needed. */
     }
   }
 
@@ -80,21 +87,22 @@ extern void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt)
   time->nsec = res.tv_nsec;
 }
 
-static int is_ancestor(process candidate, process descendant)
+static bool is_ancestor(process candidate, process descendant)
 {
   struct mproc proc = mproc[descendant.parent_id]; 
 
-  /* init is the ancestor of every other process in the system */
+  /* Fact: init is the ancestor of every other process in the system. */
   if (candidate.pid == 1)
     return 1;
 
+  /* Until we meet with init. It could have been a recursion, is not it? */
   while (proc.mp_pid != 1) {
     if (candidate.pid == proc.mp_pid)
-      return 1;
+      return true;
     proc = mproc[proc.mp_parent];
   }
 
-  return 0;
+  return false;
 }
 
 int do_distort_time()
@@ -104,22 +112,24 @@ int do_distort_time()
   uint8_t scale = m_in.m1_i3;
 
   find_mprocs(&caller, &target);
-  if (target.id < 0) 
-    return EINVAL;
-  else if (caller.id == target.id) 
-    return EPERM;
 
-  /* check caller's "family position", only one can be true */
-  int is_cantecedent = is_ancestor(caller, target);
-  int is_cdescendant = is_ancestor(target, caller);
+  if (target.id < 0)
+    return EINVAL; /* The target not found. */
+  else if (caller.id == target.id)
+    return EPERM; /* The caller cannot distort itself. */
 
-  if (!is_cdescendant && !is_cantecedent)
-    return EPERM;
+  /* Check caller's "family position", only one can be true. */
+  bool is_antecedent = is_ancestor(caller, target);
+  bool is_descendant = is_ancestor(target, caller);
 
+  if (!is_descendant && !is_antecedent)
+    return EPERM; /* The target is not from caller's family. */
+
+  /* Finally... */
   struct mproc* proc = &mproc[target.id];
   proc->mp_dt_scale = scale;
   proc->mp_dt_flag = DT_DISTORTED;
-  proc->mp_dt_flag |= is_cantecedent ? DT_DESCENDANT : DT_ANTECEDENT;
+  proc->mp_dt_flag |= is_antecedent ? DT_ANTECEDENT : DT_DESCENDANT;
 
   return OK;
 }
