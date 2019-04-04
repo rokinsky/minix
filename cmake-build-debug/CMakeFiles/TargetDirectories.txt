@@ -1,0 +1,3 @@
+/mnt/minix/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/mnt/minix/cmake-build-debug/CMakeFiles/edit_cache.dir
+/mnt/minix/cmake-build-debug/CMakeFiles/minix_source.dir
