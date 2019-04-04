@@ -16,6 +16,13 @@
 #include <sys/time.h>
 #include "mproc.h"
 
+#define DT_NORMAL     0
+#define DT_DISTORTED  1
+#define DT_BENCHMARK  2
+
+#define DT_ANTECEDENT 4
+#define DT_DESCENDANT 8
+
 /*===========================================================================*
  *				do_gettime				     *
  *===========================================================================*/
