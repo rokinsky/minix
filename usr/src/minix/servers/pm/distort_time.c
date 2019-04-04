@@ -8,7 +8,6 @@
 #include <stdbool.h>
 #include "pm.h"
 #include "mproc.h"
-#include "proto.h"
 
 /* Brackets are never redundant here, states are below. */
 #define DT_CHECK(flag, state) (((flag) & (state)) == (state))
@@ -49,7 +48,7 @@ static void find_mprocs(process* caller, process* target)
 extern void reset_time_perception()
 {
   for (int i = 0; i < NR_PROCS; i++)
-    mproc[i].mp_dt_flag = DT_NORMAL;
+    mproc[i].mp_dt_benchmark = (struct timeval) {{0}, {0}};
 }
 
 extern void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt)
