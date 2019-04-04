@@ -72,9 +72,9 @@ extern void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt)
     } else {
       /* Let's distort! */
       bool is_antecedent = DT_CHECK(flag, DT_ANTECEDENT); 
-      scale = is_antecedent ? scale : 1 / scale;
+      scale = is_antecedent ? scale : (1 / scale);
       /* Almost correct result... */
-      res = bm + (rt - bm) * scale;
+      res = bm + ((rt - bm) * scale);
       /* TODO: better accuracy if needed. */
       printf("gtp, %d: distorted res %lu, scale %u\n", mp->mp_pid, res, mp->mp_dt_scale);
     }

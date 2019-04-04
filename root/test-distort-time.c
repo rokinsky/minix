@@ -6,13 +6,14 @@
 #include <time.h>
 #include <sys/wait.h>
 
-void print_time(int p) {
+struct timeval print_time(int p) {
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
-	printf("%d: <%ld.%06ld>\n", (long int)(tv.tv_sec), (long int)(tv.tv_usec));
+	printf("%d: <%ld.%06ld>\n", p, (long int)(tv.tv_sec), (long int)(tv.tv_usec));
 	if (p == 1) {
 		printf("\n");
 	}
+	return tv;
 }
 
 void P2(pid_t parent) {
@@ -78,11 +79,11 @@ void P3() {
 
 	sleep(5);
 
-	print_time(3);
+	struct timeval tv = print_time(3);
 
 	sleep(9);
 
-	settimeofday(&tv_end, NULL);
+	settimeofday(&tv, NULL);
 	print_time(3);
 
 	wait(0);
