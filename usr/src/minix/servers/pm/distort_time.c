@@ -76,7 +76,7 @@ extern void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt)
       /* Almost correct result... */
       res = bm + (rt - bm) * scale;
       /* TODO: better accuracy if needed. */
-      printf("gtp, %d: distorted res %lu, scale %.2f\n", mp->mp_pid, res, mp->mp_dt_scale);
+      printf("gtp, %d: distorted res %lu, scale %u\n", mp->mp_pid, res, mp->mp_dt_scale);
     }
   }
 

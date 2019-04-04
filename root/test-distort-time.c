@@ -6,31 +6,23 @@
 #include <time.h>
 #include <sys/wait.h>
 
-void print_time(int p, struct timeval tv) {
-	time_t nowtime;
-	struct tm *nowtm;
-	char tmbuf[64], buf[64];
-	nowtime = tv.tv_sec;
-	nowtm = localtime(&nowtime);
-	strftime(tmbuf, sizeof tmbuf, "%Y-%m-%d %H:%M:%S", nowtm);
-	snprintf(buf, sizeof buf, "%s.%06ld", tmbuf, (long) tv.tv_usec);
-	printf("%u: %s\n", p, buf);
+void print_time(int p) {
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	printf("%d: <%ld.%06ld>\n", (long int)(tv.tv_sec), (long int)(tv.tv_usec));
 	if (p == 1) {
 		printf("\n");
 	}
 }
 
 void P2(pid_t parent) {
-	struct timeval tv_start, tv_end;
 	distort_time(parent, 3);
 
-	gettimeofday(&tv_start, NULL);
-	print_time(2, tv_start);
+	print_time(2);
 
 	sleep(5);
 
-	gettimeofday(&tv_end, NULL);
-	print_time(2, tv_end);
+	print_time(2);
 
 	sleep(15);
 
@@ -39,7 +31,6 @@ void P2(pid_t parent) {
 
 void P1() {
 	pid_t child, parent = getpid();
-	struct timeval tv_start, tv_end;
 
 	child = fork();
 	if (child == 0) {
@@ -49,40 +40,33 @@ void P1() {
 
 	distort_time(child, 2);
 
-	gettimeofday(&tv_start, NULL);
-	print_time(1, tv_start);
+	print_time(1);
 
 	sleep(5);
 
-	gettimeofday(&tv_end, NULL);
-	print_time(1, tv_end);
+	print_time(1);
 
 	sleep(10);
 
-	gettimeofday(&tv_start, NULL);
-	print_time(1, tv_start);
+	print_time(1);
 
 	sleep(3);
 
-	gettimeofday(&tv_end, NULL);
-	print_time(1, tv_end);
+	print_time(1);
 
 	sleep(5);
 
-	gettimeofday(&tv_start, NULL);
-	print_time(1, tv_start);
+	print_time(1);
 
 	sleep(10);
 
-	gettimeofday(&tv_end, NULL);
-	print_time(1, tv_end);
+	print_time(1);
 
 	wait(0);
 }
 
 void P3() {
 	pid_t pid;
-	struct timeval tv_start, tv_end;
 
 	pid = fork();
 	if (pid == 0) {
@@ -90,18 +74,16 @@ void P3() {
 		return;
 	}
 
-	gettimeofday(&tv_start, NULL);
-	print_time(3, tv_start);
+	print_time(3);
 
 	sleep(5);
 
-	gettimeofday(&tv_end, NULL);
-	print_time(3, tv_end);
+	print_time(3);
 
 	sleep(9);
 
 	settimeofday(&tv_end, NULL);
-	print_time(3, tv_end);
+	print_time(3);
 
 	wait(0);
 }
@@ -109,7 +91,7 @@ void P3() {
 void base_errors() {
 	printf("same process: %d\n", distort_time(getpid(), 2));
 	printf("doesn't exist: %d\n", distort_time(-1, 2));
-	printf("init: %d\n", distort_time(1, 2));
+	//printf("init: %d\n", distort_time(1, 2));
 }
 
 int main(int argc, char** argv)
