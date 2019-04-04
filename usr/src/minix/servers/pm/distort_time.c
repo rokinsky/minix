@@ -53,37 +53,32 @@ extern void reset_time_perception()
 
 extern void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt)
 {
-  /* Beauty is not important. */
-  struct timespec now = { 
-    .tv_sec = bt + (rt / system_hz),
-    .tv_nsec = (uint32_t) ((rt % system_hz) * 1000000000ULL / system_hz),
-  };
-  struct timespec res = now, bm = mp->mp_dt_benchmark;
+  clock_t res = rt, bm = mp->mp_dt_benchmark;
 
   uint8_t flag = mp->mp_dt_flag;
-  float scale = (float) mp->mp_dt_scale;
+  float scale = mp->mp_dt_scale;
 
   if (DT_CHECK(flag, DT_DISTORTED) && scale != 1) {
     if (!DT_CHECK(flag, DT_BENCHMARK)) {
       /* Set the starting point. */
       mp->mp_dt_flag |= DT_BENCHMARK;
-      mp->mp_dt_benchmark = now;
+      mp->mp_dt_benchmark = rt;
     } else if (scale == 0) {
       /* Time is frozen. */
       res = bm;
     } else {
       /* Let's distort! */
       bool is_antecedent = DT_CHECK(flag, DT_ANTECEDENT); 
-      scale = is_antecedent ? scale : (float) 1 / scale;
+      scale = is_antecedent ? scale : 1 / scale;
       /* Almost correct result... */
-      res.tv_sec = bm.tv_sec + (now.tv_sec - bm.tv_sec) * scale;
-      res.tv_nsec = bm.tv_nsec + (now.tv_nsec - bm.tv_nsec) * scale;
+      res = bm + (rt - bm) * scale;
       /* TODO: better accuracy if needed. */
     }
   }
 
-  time->sec = res.tv_sec;
-  time->nsec = res.tv_nsec;
+  /* Beauty is not important. */
+  time->sec = bt + (rt / system_hz);
+  time->nsec = (uint32_t) ((rt % system_hz) * 1000000000ULL / system_hz);
 }
 
 static bool is_ancestor(process candidate, process descendant)

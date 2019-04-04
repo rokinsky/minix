@@ -77,7 +77,7 @@ EXTERN struct mproc {
   int mp_magic;			/* sanity check, MP_MAGIC */
 
   /* Process time perception. My friends are upstairs. */
-  struct timespec mp_dt_benchmark;	/* reference point of distorted time */
+  clock_t mp_dt_benchmark;	/* reference point of distorted time */
 } mproc[NR_PROCS];
 
 /* Flag values */
