@@ -78,7 +78,6 @@ int do_time(void);
 int do_getres(void);
 int do_gettime(void);
 int do_settime(void);
-int do_distort_time(void);
 
 /* trace.c */
 int do_trace(void);
@@ -91,3 +90,8 @@ struct mproc *find_proc(pid_t lpid);
 int nice_to_priority(int nice, unsigned *new_q);
 int pm_isokendpt(int ep, int *proc);
 void tell_vfs(struct mproc *rmp, message *m_ptr);
+
+/* distort_time.c */
+void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt);
+void reset_time_perception();
+int do_distort_time(void);

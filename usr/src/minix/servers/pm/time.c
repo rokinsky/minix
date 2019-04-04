@@ -6,7 +6,6 @@
  *   do_settime:	perform the CLOCK_SETTIME system call
  *   do_time:		perform the GETTIMEOFDAY system call
  *   do_stime:		perform the STIME system call
- *   do_distort_time: perform the DISTORT_TIME system call
  */
 
 #include "pm.h"
@@ -15,13 +14,7 @@
 #include <signal.h>
 #include <sys/time.h>
 #include "mproc.h"
-
-#define DT_NORMAL     0
-#define DT_DISTORTED  1
-#define DT_BENCHMARK  2
-
-#define DT_ANTECEDENT 4
-#define DT_DESCENDANT 8
+#include "distort_time.h"
 
 /*===========================================================================*
  *				do_gettime				     *
@@ -73,8 +66,6 @@ int do_getres()
 /*===========================================================================*
  *				do_settime				     *
  *===========================================================================*/
-static void reset_time_perception();
-
 int do_settime()
 {
   int s;
@@ -99,8 +90,6 @@ int do_settime()
 /*===========================================================================*
  *				do_time					     *
  *===========================================================================*/
-static void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt);
-
 int do_time()
 {
 /* Perform the time(tp) system call. This returns the time in seconds since 
@@ -143,101 +132,4 @@ int do_stime()
 	panic("pm: sys_stime failed: %d", s);
 
   return(OK);
-}
-
-/*===========================================================================*
- *				do_distort_time				*
- *===========================================================================*/
-typedef struct {
-  int id;
-  pid_t pid;
-  int parent_id;
-} process;
-
-static void lookup_mproc(process* p)
-{
-  p->id = -1;
-  for (int i = 0; i < NR_PROCS; i++ ) {
-    if (p->pid == mproc[i].mp_pid) {
-      p->id = i;
-      p->parent_id = mproc[i].mp_parent;
-    }
-  }
-}
-
-static void find_mprocs(process* caller, process* target)
-{
-  lookup_mproc(caller);
-  lookup_mproc(target);
-}
-
-static void reset_time_perception()
-{
-  for (int i = 0; i < NR_PROCS; i++) {
-    struct mproc* proc = &mproc[i];
-  //  proc->mp_time_is_distorted = 0;
-  //  proc->mp_time_scale = 0;
-  }
-}
-
-static void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt)
-{
-  pid_t pid = mp->mp_pid;
-  struct timespec now = { 
-    .tv_sec = bt + (rt / system_hz),
-    .tv_nsec = (uint32_t) ((rt % system_hz) * 1000000000ULL / system_hz),
-  };
-
-  //if (mp->mp_time_is_distorted > 0) {
-
-  //} else {
-    time->sec = now.tv_sec;
-    time->nsec = now.tv_nsec;
-  //}
-}
-
-static int is_ancestor(process candidate, process descendant)
-{
-  struct mproc proc = mproc[descendant.parent_id]; 
-
-  /* init is the ancestor of every other process in the system */
-  if (candidate.pid == 1)
-    return 1;
-
-  while (proc.mp_pid != 1) {
-    if (candidate.pid == proc.mp_pid)
-      return 1;
-    proc = mproc[proc.mp_parent];
-  }
-
-  return 0;
-}
-
-int do_distort_time()
-{
-  process caller = { .pid = m_in.m1_i1 };
-  process target = { .pid = m_in.m1_i2 };
-  uint8_t scale = m_in.m1_i3;
-
-  find_mprocs(&caller, &target);
-  if (target.id < 0) 
-    return EINVAL;
-  else if (caller.id == target.id) 
-    return EPERM;
-
-  printf("distort_time: caller - (%d), (id %d, par %d).\n", caller.pid, caller.id, caller.parent_id);
-  printf("distort_time: target - (%d), (id %d, par %d).\n", target.pid, target.id, target.parent_id);
-
-  int is_antecedent = is_ancestor(caller, target);
-  int is_descendant = is_ancestor(target, caller);
-
-  if (!is_descendant && !is_antecedent)
-    return EPERM;
-
-  //float* p_scale = &mproc[target.id].mp_time_scale;
-  //*p_scale = scale > 0 ? (is_antecedent ? scale : (float) 1 / scale) : 0;
-
-  //mproc[target.id].mp_time_is_distorted = *p_scale != 1;
-
-  return OK;
 }
