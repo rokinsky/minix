@@ -59,7 +59,7 @@ extern void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt)
   float scale = mp->mp_dt_scale;
 
   if (DT_CHECK(flag, DT_DISTORTED) && scale != 1) {
-    printf("gtp, %d:, flag %d, scale %g, bt %llu\n", mp->mp_pid, flag, scale, bt);
+    printf("gtp, %d:, flag %d, scale %.2f, bt %llu, rt %lu\n", mp->mp_pid, flag, scale, bt, rt);
     if (!DT_CHECK(flag, DT_BENCHMARK)) {
       /* Set the starting point. */
       mp->mp_dt_flag |= DT_BENCHMARK;
@@ -76,7 +76,7 @@ extern void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt)
       /* Almost correct result... */
       res = bm + (rt - bm) * scale;
       /* TODO: better accuracy if needed. */
-      printf("gtp, %d:, distorted res %lu, scale %g\n", mp->mp_pid, res, scale);
+      printf("gtp, %d:, distorted res %lu, scale %.2f\n", mp->mp_pid, res, scale);
     }
   }
 
