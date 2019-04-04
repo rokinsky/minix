@@ -42,8 +42,10 @@ void P1() {
 	struct timeval tv_start, tv_end;
 
 	child = fork();
-	if (child == 0)
+	if (child == 0) {
 		P2(parent);
+		return;
+	}
 
 	distort_time(child, 2);
 
@@ -83,12 +85,13 @@ void P3() {
 	struct timeval tv_start, tv_end;
 
 	pid = fork();
-	if (pid == 0)
+	if (pid == 0) {
 		P1();
+		return;
+	}
 
 	gettimeofday(&tv_start, NULL);
 	print_time(3, tv_start);
-
 
 	sleep(5);
 
