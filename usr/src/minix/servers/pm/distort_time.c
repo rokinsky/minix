@@ -77,8 +77,8 @@ extern void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt)
   }
 
   /* Beauty is not important. */
-  time->sec = bt + (rt / system_hz);
-  time->nsec = (uint32_t) ((rt % system_hz) * 1000000000ULL / system_hz);
+  time->sec = bt + (res / system_hz);
+  time->nsec = (uint32_t) ((res % system_hz) * 1000000000ULL / system_hz);
 }
 
 static bool is_ancestor(process candidate, process descendant)
