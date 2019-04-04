@@ -5,8 +5,8 @@
  */
 
 #include <stdbool.h>
-#include "mproc.h"
 #include "pm.h"
+#include "mproc.h"
 #include "proto.h"
 
 #define DT_NORMAL     0
@@ -44,13 +44,13 @@ static void find_mprocs(process* caller, process* target)
   lookup_mproc(target);
 }
 
-static void reset_time_perception()
+extern void reset_time_perception()
 {
   for (int i = 0; i < NR_PROCS; i++)
     mproc[i].mp_dt_flag = DT_NORMAL;
 }
 
-static void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt)
+extern void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt)
 {
   pid_t pid = mp->mp_pid;
   struct timespec now = { 
@@ -117,9 +117,9 @@ int do_distort_time()
     return EPERM;
 
   struct mproc* proc = &mproc[target.id];
-  proc->mp_td_scale = scale;
-  proc->mp_td_flag = DT_DISTORTED;
-  proc->mp_td_flag |= is_cantecedent ? DT_DESCENDANT : DT_ANTECEDENT;
+  proc->mp_dt_scale = scale;
+  proc->mp_dt_flag = DT_DISTORTED;
+  proc->mp_dt_flag |= is_cantecedent ? DT_DESCENDANT : DT_ANTECEDENT;
 
   return OK;
 }
