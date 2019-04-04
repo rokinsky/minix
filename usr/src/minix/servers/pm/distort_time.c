@@ -48,7 +48,7 @@ static void find_mprocs(process* caller, process* target)
 extern void reset_time_perception()
 {
   for (int i = 0; i < NR_PROCS; i++)
-    mproc[i].mp_dt_benchmark.tv_sec = mproc[i].mp_dt_benchmark.tv_nsec = 0;
+    mproc[i].mp_dt_flag ^= DT_BENCHMARK;
 }
 
 extern void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt)
