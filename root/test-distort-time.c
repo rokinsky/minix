@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <time.h>
+#include <sys/wait.h>
 
 void print_time(int p, struct timeval tv) {
 	time_t nowtime;
@@ -37,10 +38,10 @@ void P1() {
 	pid_t child, parent = getpid();
 	struct timeval tv_start, tv_end;
 
-	if ((child = fork()) < 0) void
-	if (child == 0) {
+	child = fork();
+	if (child == 0)
 		P2(parent);
-	}
+
 	distort_time(child, 2);
 
 	gettimeofday(&tv_start, NULL);
@@ -79,10 +80,9 @@ void P3() {
 	pid_t pid;
 	struct timeval tv_start, tv_end;
 
-	if ((pid = fork()) < 0) void
-	if (pid == 0) {
+	pid = fork();
+	if (pid == 0)
 		P1();
-	}
 
 	gettimeofday(&tv_start, NULL);
 	print_time(3, tv_start);
