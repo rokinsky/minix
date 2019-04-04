@@ -15,11 +15,14 @@ void print_time(int p, struct timeval tv) {
 	strftime(tmbuf, sizeof tmbuf, "%Y-%m-%d %H:%M:%S", nowtm);
 	snprintf(buf, sizeof buf, "%s.%06ld", tmbuf, (long) tv.tv_usec);
 	printf("%u: %s\n", p, buf);
+	if (p == 1) {
+		printf("\n");
+	}
 }
 
 void P2(pid_t parent) {
 	struct timeval tv_start, tv_end;
-	distort_time(parent, 2);
+	distort_time(parent, 3);
 
 	gettimeofday(&tv_start, NULL);
 	print_time(2, tv_start);
@@ -53,7 +56,6 @@ void P1() {
 	print_time(1, tv_end);
 
 	sleep(10);
-	printf("%d: new test\n", 1);
 
 	gettimeofday(&tv_start, NULL);
 	print_time(1, tv_start);
@@ -87,6 +89,7 @@ void P3() {
 	gettimeofday(&tv_start, NULL);
 	print_time(3, tv_start);
 
+
 	sleep(5);
 
 	gettimeofday(&tv_end, NULL);
@@ -95,6 +98,7 @@ void P3() {
 	sleep(9);
 
 	settimeofday(&tv_end, NULL);
+	print_time(3, tv_end);
 
 	wait(0);
 }
