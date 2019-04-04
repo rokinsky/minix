@@ -59,16 +59,16 @@ extern void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt)
   float scale = mp->mp_dt_scale;
 
   if (DT_CHECK(flag, DT_DISTORTED) && scale != 1) {
-    printf("gtp, %d:, flag %d, scale %.2f, bt %llu, rt %lu\n", mp->mp_pid, flag, scale, bt, rt);
+    printf("gtp, %d: flag %d, bt %llu, rt %lu\n", mp->mp_pid, flag, bt, rt);
     if (!DT_CHECK(flag, DT_BENCHMARK)) {
       /* Set the starting point. */
       mp->mp_dt_flag |= DT_BENCHMARK;
       mp->mp_dt_benchmark = rt;
-      printf("gtp, %d:, remember bm %lu\n", mp->mp_pid, rt);
+      printf("gtp, %d: remember bm %lu\n", mp->mp_pid, rt);
     } else if (scale == 0) {
       /* Time is frozen. */
       res = bm;
-      printf("gtp, %d:, frozen bm %lu\n", mp->mp_pid, bm);
+      printf("gtp, %d: frozen bm %lu\n", mp->mp_pid, bm);
     } else {
       /* Let's distort! */
       bool is_antecedent = DT_CHECK(flag, DT_ANTECEDENT); 
@@ -76,7 +76,7 @@ extern void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt)
       /* Almost correct result... */
       res = bm + (rt - bm) * scale;
       /* TODO: better accuracy if needed. */
-      printf("gtp, %d:, distorted res %lu, scale %.2f\n", mp->mp_pid, res, scale);
+      printf("gtp, %d: distorted res %lu, scale %.2f\n", mp->mp_pid, res, mp->mp_dt_scale);
     }
   }
 
