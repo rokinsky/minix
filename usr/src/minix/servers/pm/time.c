@@ -14,7 +14,6 @@
 #include <signal.h>
 #include <sys/time.h>
 #include "mproc.h"
-#include "distort_time.h"
 
 /*===========================================================================*
  *				do_gettime				     *
