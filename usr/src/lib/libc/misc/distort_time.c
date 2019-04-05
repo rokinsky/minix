@@ -1,10 +1,8 @@
-#include <lib.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <minix/rs.h>
 #include <errno.h>
+#include <inttypes.h>
+#include <lib.h>
+#include <minix/com.h>
+#include <unistd.h>
 
 int distort_time(pid_t pid, uint8_t scale)
 {
