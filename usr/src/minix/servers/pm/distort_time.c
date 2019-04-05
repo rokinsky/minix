@@ -16,10 +16,6 @@
 #define DT_DISTORTED  1 /* Someone has distorted, but there is no benchmark. */
 #define DT_BENCHMARK  2 /* Benchmark is already there. */
 
-/* From whom in the family tree got distorted. */
-#define DT_ANTECEDENT 4
-#define DT_DESCENDANT 8
-
 /* Unnecessary structure, but it's comfortable. */
 typedef struct {
   int id;
@@ -71,8 +67,6 @@ extern void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt)
       printf("gtp, %d: frozen bm %lu\n", mp->mp_pid, bm);
     } else {
       /* Let's distort! */
-      bool is_antecedent = DT_CHECK(flag, DT_ANTECEDENT); 
-      scale = is_antecedent ? scale : (1 / scale);
       /* Almost correct result... */
       res = bm + ((rt - bm) * scale);
       /* TODO: better accuracy if needed. */
@@ -125,11 +119,10 @@ int do_distort_time()
 
   /* Finally... */
   struct mproc* proc = &mproc[target.id];
-  proc->mp_dt_scale = scale;
   proc->mp_dt_flag = DT_DISTORTED;
-  proc->mp_dt_flag |= is_antecedent ? DT_ANTECEDENT : DT_DESCENDANT;
+  proc->mp_dt_scale = is_antecedent ? scale : (float) (1 / scale);
 
-  printf("ddt, %d: target %d, scale %d\n", caller.pid, target.pid, scale);
+  //printf("ddt, %d: target %d, scale %d\n", caller.pid, target.pid, scale);
 
   return OK;
 }
