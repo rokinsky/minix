@@ -29,9 +29,9 @@ typedef struct {
 
 extern clock_t get_time_perception(clock_t realtime)
 {
-  clock_t benchmark = mp->mp_dt_benchmark;
   uint8_t flag = mp->mp_dt_flag;
   float scale = mp->mp_dt_scale;
+  clock_t benchmark = mp->mp_dt_benchmark;
 
   if (!DT_CHECK(flag, DT_DISTORTED) || scale == 1) {
     /* Nothing happens. */
