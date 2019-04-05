@@ -17,7 +17,7 @@ struct timeval print_time(int p) {
 }
 
 void P2(pid_t parent) {
-	distort_time(parent, 3);
+	distort_time(parent, 2);
 
 	print_time(2);
 
@@ -39,7 +39,7 @@ void P1() {
 		return;
 	}
 
-	distort_time(child, 2);
+	distort_time(child, 3);
 
 	print_time(1);
 

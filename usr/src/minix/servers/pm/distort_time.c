@@ -16,10 +16,6 @@
 #define DT_DISTORTED  1 /* Someone has distorted, but there is no benchmark. */
 #define DT_BENCHMARK  2 /* Benchmark is already there. */
 
-/* From whom in the family tree got distorted. */
-#define DT_ANTECEDENT 4
-#define DT_DESCENDANT 8
-
 /* Unnecessary structure, but it's comfortable. */
 typedef struct {
   int id;
@@ -113,9 +109,8 @@ int do_distort_time()
 
   /* Finally... */
   struct mproc* proc = &mproc[target.id];
-  proc->mp_dt_scale = scale;
   proc->mp_dt_flag = DT_DISTORTED;
-  proc->mp_dt_flag |= is_antecedent ? DT_ANTECEDENT : DT_DESCENDANT;
+  proc->mp_dt_scale = is_antecedent ? scale : (float) (1 / scale);
 
   return OK;
 }
