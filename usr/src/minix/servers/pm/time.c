@@ -103,7 +103,11 @@ int do_time()
   if ( (s=getuptime(&ticks, &realtime, &boottime)) != OK)
   	panic("do_time couldn't get uptime: %d", s);
 
-  get_time_perception(&(mp->mp_reply.m_pm_lc_time), realtime, boottime);
+  realtime = get_time_perception(realtime);
+
+  mess_pm_lc_time* time = &mp->mp_reply.m_pm_lc_time;
+  time->sec = boottime + (realtime / system_hz);
+  time->nsec = (uint32_t) ((realtime % system_hz) * 1000000000ULL / system_hz);
   return(OK);
 }
 

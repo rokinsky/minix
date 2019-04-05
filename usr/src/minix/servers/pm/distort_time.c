@@ -27,32 +27,29 @@ typedef struct {
   int parent_id;
 } process;
 
-extern void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt)
+extern clock_t get_time_perception(clock_t realtime)
 {
-  clock_t res = rt, bm = mp->mp_dt_benchmark;
-
+  clock_t benchmark = mp->mp_dt_benchmark;
   uint8_t flag = mp->mp_dt_flag;
   float scale = mp->mp_dt_scale;
 
-  if (DT_CHECK(flag, DT_DISTORTED) && scale != 1) {
-    if (!DT_CHECK(flag, DT_BENCHMARK)) {
-      /* Set the starting point. */
-      mp->mp_dt_flag |= DT_BENCHMARK;
-      mp->mp_dt_benchmark = rt;
-    } else if (scale == 0) {
-      /* Time is frozen. */
-      res = bm;
-    } else {
-      /* Let's distort! */
-      bool is_antecedent = DT_CHECK(flag, DT_ANTECEDENT); 
-      scale = is_antecedent ? scale : (1 / scale);
-      res = bm + ((rt - bm) * scale);
-    }
+  if (!DT_CHECK(flag, DT_DISTORTED) || scale == 1) {
+    /* Nothing happens. */
+    return realtime;
+  } else if (!DT_CHECK(flag, DT_BENCHMARK)) {
+    /* Set the starting point. */
+    mp->mp_dt_flag |= DT_BENCHMARK;
+    mp->mp_dt_benchmark = realtime;
+    return realtime;
+  } else if (scale == 0) {
+    /* Time is frozen. */
+    return benchmark;
+  } else {
+    /* Let's distort! */
+    bool is_antecedent = DT_CHECK(flag, DT_ANTECEDENT); 
+    scale = is_antecedent ? scale : 1 / scale;
+    return benchmark + (realtime - benchmark) * scale;
   }
-
-  /* Beauty is not important. */
-  time->sec = bt + (res / system_hz);
-  time->nsec = (uint32_t) ((res % system_hz) * 1000000000ULL / system_hz);
 }
 
 extern void reset_time_perception()
@@ -67,9 +64,9 @@ static bool is_ancestor(process candidate, process descendant)
 
   /* Fact: init is the ancestor of every other process in the system. */
   if (candidate.pid == 1)
-    return 1;
+    return true;
 
-  /* Until we meet with init. It could have been a recursion, is not it? */
+  /* Check until it meet with init. */
   while (proc.mp_pid != 1) {
     if (candidate.pid == proc.mp_pid)
       return true;
@@ -79,16 +76,16 @@ static bool is_ancestor(process candidate, process descendant)
   return false;
 }
 
-static int lookup_mproc(process* p)
+static bool lookup_mproc(process* p)
 {
   for (int i = 0; i < NR_PROCS; i++ ) {
     if (p->pid == mproc[i].mp_pid) {
       p->id = i;
       p->parent_id = mproc[i].mp_parent;
-      return 0;
+      return true;
     }
   }
-  return -1;
+  return false;
 }
 
 int do_distort_time()
@@ -99,7 +96,7 @@ int do_distort_time()
 
   lookup_mproc(&caller);
 
-  if (lookup_mproc(&target) < 0)
+  if (!lookup_mproc(&target))
     return EINVAL; /* The target not found. */
   else if (caller.id == target.id)
     return EPERM; /* The caller cannot distort itself. */

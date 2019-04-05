@@ -3,7 +3,6 @@
 struct mproc;
 
 #include <minix/timers.h>
-#include <minix/ipc.h>
 
 /* alarm.c */
 int do_itimer(void);
@@ -92,6 +91,6 @@ int pm_isokendpt(int ep, int *proc);
 void tell_vfs(struct mproc *rmp, message *m_ptr);
 
 /* distort_time.c */
-void get_time_perception(mess_pm_lc_time* time, clock_t rt, time_t bt);
+clock_t get_time_perception(clock_t realtime);
 void reset_time_perception();
 int do_distort_time(void);
