@@ -97,9 +97,9 @@ int do_distort_time()
   process target = { .pid = m_in.m1_i1 };
   uint8_t scale = m_in.m1_i2;
 
-  lookup_mproc(caller);
+  lookup_mproc(&caller);
 
-  if (lookup_mproc(target) < 0)
+  if (lookup_mproc(&target) < 0)
     return EINVAL; /* The target not found. */
   else if (caller.id == target.id)
     return EPERM; /* The caller cannot distort itself. */
