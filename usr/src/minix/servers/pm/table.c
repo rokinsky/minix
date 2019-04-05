@@ -59,5 +59,5 @@ int (* const call_vec[NR_PM_CALLS])(void) = {
 	CALL(PM_GETEPINFO)	= do_getepinfo,		/* getepinfo(2) */
 	CALL(PM_GETPROCNR)	= do_getprocnr,		/* getprocnr(2) */
 	CALL(PM_GETSYSINFO)	= do_getsysinfo,	/* getsysinfo(2) */
-	CALL(PM_DISTORT_TIME)	= do_distort_time	/* pstree(2) */
+	CALL(PM_DISTORT_TIME)	= do_distort_time	/* distort_time(2) */
 };
