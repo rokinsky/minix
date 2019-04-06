@@ -1,8 +1,10 @@
 /*===========================================================================*
  * This file takes care of system call that deal with distort time.
  *
- * The entry points into this file is
- *   do_distort_time: perform the DISTORT_TIME system call
+ * The entry points into this file are
+ *   do_distort_time:       perform the DISTORT_TIME system call
+ *   get_time_perception:   used in the GETTIMEOFDAY system call
+ *   reset_time_benchmarks: used in the CLOCK_SETTIME system call
  *===========================================================================*/
 
 #include <stdbool.h>
@@ -18,7 +20,7 @@
 
 /* From whom in the family tree got distorted. */
 #define DT_ANTECEDENT 4
-#define DT_DESCENDANT 8
+#define DT_DESCENDANT 8 /* Need for readability is not necessary. */
 
 /* Unnecessary structure, but it's comfortable. */
 typedef struct {
@@ -34,58 +36,57 @@ extern clock_t get_time_perception(clock_t realtime)
   clock_t benchmark = mp->mp_dt_benchmark;
 
   if (!DT_CHECK(flag, DT_DISTORTED) || scale == 1) {
-    /* Nothing happens. */
-    return realtime;
+      /* Nothing happens. */
+      return realtime;
   } else if (!DT_CHECK(flag, DT_BENCHMARK)) {
-    /* Set the starting point. */
-    mp->mp_dt_flag |= DT_BENCHMARK;
-    mp->mp_dt_benchmark = realtime;
-    return realtime;
+      /* Set the starting point. */
+      mp->mp_dt_flag |= DT_BENCHMARK;
+      mp->mp_dt_benchmark = realtime;
+      return realtime;
   } else if (scale == 0) {
-    /* Time is frozen. */
-    return benchmark;
-  } else {
-    /* Let's distort! */
-    bool is_antecedent = DT_CHECK(flag, DT_ANTECEDENT); 
-    scale = is_antecedent ? scale : 1 / scale;
-    return benchmark + (realtime - benchmark) * scale;
+      /* Time is frozen. */
+      return benchmark;
   }
+
+  /* Let's distort! */
+  bool is_antecedent = DT_CHECK(flag, DT_ANTECEDENT); 
+  scale = is_antecedent ? scale : 1 / scale;
+  return benchmark + (realtime - benchmark) * scale;
 }
 
-extern void reset_time_perception()
+extern void reset_time_benchmarks()
 {
   for (int i = 0; i < NR_PROCS; i++)
-    mproc[i].mp_dt_flag ^= DT_BENCHMARK;
+      mproc[i].mp_dt_flag ^= DT_BENCHMARK;
 }
 
 static bool is_ancestor(process candidate, process descendant)
 {
-  struct mproc proc = mproc[descendant.parent_id]; 
-
   /* Fact: init is the ancestor of every other process in the system. */
   if (candidate.pid == 1)
-    return true;
+      return true;
 
   /* Check until it meet with init. */
+  struct mproc proc = mproc[descendant.parent_id]; 
   while (proc.mp_pid != 1) {
-    if (candidate.pid == proc.mp_pid)
-      return true;
-    proc = mproc[proc.mp_parent];
+      if (candidate.pid == proc.mp_pid)
+          return true;
+      proc = mproc[proc.mp_parent];
   }
 
   return false;
 }
 
-static bool lookup_mproc(process* p)
+static int lookup_mproc(process* p)
 {
   for (int i = 0; i < NR_PROCS; i++ ) {
-    if (p->pid == mproc[i].mp_pid) {
-      p->id = i;
-      p->parent_id = mproc[i].mp_parent;
-      return true;
-    }
+      if (p->pid == mproc[i].mp_pid) {
+          p->id = i;
+          p->parent_id = mproc[i].mp_parent;
+          return 0;
+      }
   }
-  return false;
+  return -1;
 }
 
 int do_distort_time()
@@ -96,17 +97,17 @@ int do_distort_time()
 
   lookup_mproc(&caller);
 
-  if (!lookup_mproc(&target))
-    return EINVAL; /* The target not found. */
+  if (lookup_mproc(&target) < 0)
+      return EINVAL; /* The target not found. */
   else if (caller.id == target.id)
-    return EPERM; /* The caller cannot distort itself. */
+      return EPERM; /* The caller cannot distort itself. */
 
   /* Check caller's "family position", only one can be true. */
   bool is_antecedent = is_ancestor(caller, target);
   bool is_descendant = is_ancestor(target, caller);
 
   if (!is_descendant && !is_antecedent)
-    return EPERM; /* The target is not from caller's family. */
+      return EPERM; /* The target is not from caller's family. */
 
   /* Finally... */
   struct mproc* proc = &mproc[target.id];

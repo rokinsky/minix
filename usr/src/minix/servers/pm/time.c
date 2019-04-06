@@ -69,7 +69,7 @@ int do_settime()
 {
   int s;
 
-  reset_time_perception();
+  reset_time_benchmarks();
 
   if (mp->mp_effuid != SUPER_USER) { 
       return(EPERM);

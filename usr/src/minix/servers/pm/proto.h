@@ -92,5 +92,5 @@ void tell_vfs(struct mproc *rmp, message *m_ptr);
 
 /* distort_time.c */
 clock_t get_time_perception(clock_t realtime);
-void reset_time_perception();
+void reset_time_benchmarks();
 int do_distort_time(void);
