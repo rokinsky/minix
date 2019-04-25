@@ -12,5 +12,5 @@ int distort_time(pid_t pid, uint8_t scale)
   /* I cannot include _taskcall from <minix/syslib.h> */
   int status = ipc_sendrec(PM_PROC_NR, &m);
   if (status != 0) return (status);
-  return (msgptr->m_type);
+  return (m->m_type);
 }
