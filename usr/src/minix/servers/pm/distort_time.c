@@ -32,20 +32,20 @@ typedef struct {
 extern clock_t get_time_perception(clock_t realtime)
 {
   uint8_t flag = mp->mp_dt_flag;
-  float scale = mp->mp_dt_scale;
+  float scale = (float) mp->mp_dt_scale;
   clock_t benchmark = mp->mp_dt_benchmark;
 
-  if (!DT_CHECK(flag, DT_DISTORTED) || scale == 1) {
-      /* Nothing happens. */
-      return realtime;
+  if (!DT_CHECK(flag, DT_DISTORTED)) {
+  	/* Nothing happens. */
+  	return realtime;
   } else if (!DT_CHECK(flag, DT_BENCHMARK)) {
-      /* Set the starting point. */
-      mp->mp_dt_flag |= DT_BENCHMARK;
-      mp->mp_dt_benchmark = realtime;
-      return realtime;
+  	/* Set the starting point. */
+  	mp->mp_dt_flag |= DT_BENCHMARK;
+  	mp->mp_dt_benchmark = realtime;
+  	return realtime;
   } else if (scale == 0) {
-      /* Time is frozen. */
-      return benchmark;
+  	/* Time is frozen. */
+  	return benchmark;
   }
 
   /* Let's distort! */
@@ -57,21 +57,21 @@ extern clock_t get_time_perception(clock_t realtime)
 extern void reset_time_benchmarks()
 {
   for (int i = 0; i < NR_PROCS; i++)
-      mproc[i].mp_dt_flag ^= DT_BENCHMARK;
+  	mproc[i].mp_dt_flag ^= DT_BENCHMARK;
 }
 
 static bool is_ancestor(process candidate, process descendant)
 {
   /* Fact: init is the ancestor of every other process in the system. */
   if (candidate.pid == 1)
-      return true;
+  	return true;
 
   /* Check until it meet with init. */
   struct mproc proc = mproc[descendant.parent_id]; 
   while (proc.mp_pid != 1) {
-      if (candidate.pid == proc.mp_pid)
-          return true;
-      proc = mproc[proc.mp_parent];
+  	if (candidate.pid == proc.mp_pid)
+  		return true;
+  	proc = mproc[proc.mp_parent];
   }
 
   return false;
@@ -80,11 +80,11 @@ static bool is_ancestor(process candidate, process descendant)
 static int lookup_mproc(process* p)
 {
   for (int i = 0; i < NR_PROCS; i++ ) {
-      if (p->pid == mproc[i].mp_pid) {
-          p->id = i;
-          p->parent_id = mproc[i].mp_parent;
-          return 0;
-      }
+  	if (p->pid == mproc[i].mp_pid) {
+  		p->id = i;
+  		p->parent_id = mproc[i].mp_parent;
+  		return 0;
+  	}
   }
   return -1;
 }
@@ -98,16 +98,16 @@ int do_distort_time()
   lookup_mproc(&caller);
 
   if (lookup_mproc(&target) < 0)
-      return EINVAL; /* The target not found. */
+  	return EINVAL; /* The target not found. */
   else if (caller.id == target.id)
-      return EPERM; /* The caller cannot distort itself. */
+  	return EPERM; /* The caller cannot distort itself. */
 
   /* Check caller's "family position", only one can be true. */
   bool is_antecedent = is_ancestor(caller, target);
   bool is_descendant = is_ancestor(target, caller);
 
   if (!is_descendant && !is_antecedent)
-      return EPERM; /* The target is not from caller's family. */
+  	return EPERM; /* The target is not from caller's family. */
 
   /* Finally... */
   struct mproc* proc = &mproc[target.id];

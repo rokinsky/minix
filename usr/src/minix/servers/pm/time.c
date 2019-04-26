@@ -69,14 +69,13 @@ int do_settime()
 {
   int s;
 
-  reset_time_benchmarks();
-
   if (mp->mp_effuid != SUPER_USER) { 
       return(EPERM);
   }
 
   switch (m_in.m_lc_pm_time.clk_id) {
 	case CLOCK_REALTIME:
+		reset_time_benchmarks();
 		s = sys_settime(m_in.m_lc_pm_time.now, m_in.m_lc_pm_time.clk_id,
 			m_in.m_lc_pm_time.sec, m_in.m_lc_pm_time.nsec);
 		return(s);
