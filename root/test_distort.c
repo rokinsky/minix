@@ -91,11 +91,11 @@ pid_t some_nonexistent_pid() {
 // Checks argument checking
 void test1() {
 	sleep_for(1, 1);
-	assert(distort_time(getpid(), 2) == -EPERM);
+	assert(distort_time(getpid(), 2) == EPERM);
 
-	assert(distort_time(some_nonexistent_pid(), 2) == -EINVAL);
+	assert(distort_time(some_nonexistent_pid(), 2) == EINVAL);
 
-	assert(distort_time(5, 2) == -EPERM); // 5 == pid of /service/pm
+	assert(distort_time(5, 2) == EPERM); // 5 == pid of /service/pm
 
 	assert(distort_time(getppid(), 2) == 0);
 }
