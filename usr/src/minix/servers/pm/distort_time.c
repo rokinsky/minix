@@ -56,8 +56,10 @@ extern clock_t get_time_perception(clock_t realtime)
 
 extern void reset_time_benchmarks()
 {
-  for (int i = 0; i < NR_PROCS; i++)
+  for (int i = 0; i < NR_PROCS; i++) {
   	mproc[i].mp_dt_flag ^= DT_BENCHMARK;
+  	mproc[i].mp_dt_benchmark = 0;
+  }
 }
 
 static bool is_ancestor(process candidate, process descendant)
