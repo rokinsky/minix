@@ -35,12 +35,15 @@ extern clock_t get_time_perception(clock_t realtime)
   float scale = (float) mp->mp_dt_scale;
   clock_t benchmark = mp->mp_dt_benchmark;
 
-  printf("get_time_perception: flag %u, scale %u, benchmark %lu, realtime %lu ", flag, mp->mp_dt_scale, mp->mp_dt_benchmark, realtime);
   if (!DT_CHECK(flag, DT_DISTORTED)) {
   	/* Nothing happens. */
-    printf("returned %lu\n", realtime);
   	return realtime;
-  } else if (!DT_CHECK(flag, DT_BENCHMARK)) {
+  } 
+
+  printf("get_time_perception: flag %u, scale %u, benchmark %lu, realtime %lu ", 
+    flag, mp->mp_dt_scale, mp->mp_dt_benchmark, realtime);
+
+  if (!DT_CHECK(flag, DT_BENCHMARK)) {
   	/* Set the starting point. */
   	mp->mp_dt_flag |= DT_BENCHMARK;
   	mp->mp_dt_benchmark = realtime;
@@ -118,7 +121,7 @@ int do_distort_time()
   if (!is_descendant && !is_antecedent)
   	return EPERM; /* The target is not from caller's family. */
 
-  printf("do_distort_time: caller %d(%d); target %d(%d); scale %u; is antecedent? %d", 
+  printf("do_distort_time: caller %d(%d); target %d(%d); scale %u; is antecedent? %d\n", 
     caller.pid, caller.id, target.pid, target.id, scale, is_antecedent);
 
   /* Finally... */
