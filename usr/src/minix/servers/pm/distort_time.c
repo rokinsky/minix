@@ -127,10 +127,8 @@ int do_distort_time()
   /* Finally... */
   struct mproc* proc = &mproc[target.id];
   proc->mp_dt_scale = scale;
-  bool is_benchmark = DT_CHECK(proc->mp_dt_flag, DT_BENCHMARK);
   proc->mp_dt_flag = DT_DISTORTED;
   proc->mp_dt_flag |= is_antecedent ? DT_ANTECEDENT : DT_DESCENDANT;
-  proc->mp_dt_flag |= is_benchmark ? DT_BENCHMARK : DT_NORMAL;
 
   return OK;
 }
