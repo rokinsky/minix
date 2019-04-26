@@ -59,7 +59,7 @@ extern clock_t get_time_perception(clock_t realtime)
   bool is_antecedent = DT_CHECK(flag, DT_ANTECEDENT); 
   scale = is_antecedent ? scale : 1 / scale;
   float res = benchmark + (realtime - benchmark) * scale;
-  printf("returned float %.6f; long %lu\n", res, (clock_t) res);
+  printf("returned float %lu\n", (clock_t) res);
   return benchmark + (realtime - benchmark) * scale;
 }
 
