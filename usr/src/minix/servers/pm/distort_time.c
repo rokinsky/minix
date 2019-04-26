@@ -35,6 +35,7 @@ extern clock_t get_time_perception(clock_t realtime)
   float scale = (float) mp->mp_dt_scale;
   clock_t benchmark = mp->mp_dt_benchmark;
 
+  printf("get_time_perception: flag %u, scale %u, benchmark %llu", flag, mp->mp_dt_scale, mp->mp_dt_benchmark);
   if (!DT_CHECK(flag, DT_DISTORTED)) {
   	/* Nothing happens. */
   	return realtime;
