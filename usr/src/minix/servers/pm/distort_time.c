@@ -32,7 +32,7 @@ typedef struct {
 extern clock_t get_time_perception(clock_t realtime)
 {
   uint8_t flag = mp->mp_dt_flag;
-  double scale = (double) mp->mp_dt_scale;
+  float scale = (float) mp->mp_dt_scale;
   clock_t benchmark = mp->mp_dt_benchmark;
 
   if (!DT_CHECK(flag, DT_DISTORTED)) {
@@ -58,7 +58,7 @@ extern clock_t get_time_perception(clock_t realtime)
   /* Let's distort! */
   bool is_antecedent = DT_CHECK(flag, DT_ANTECEDENT); 
   scale = is_antecedent ? scale : 1 / scale;
-  double res = benchmark + (realtime - benchmark) * scale;
+  float res = benchmark + (realtime - benchmark) * scale;
   printf("distorted returned %lu\n", (clock_t) res);
   return benchmark + (realtime - benchmark) * scale;
 }
