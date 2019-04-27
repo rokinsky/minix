@@ -40,18 +40,18 @@ extern clock_t get_time_perception(clock_t realtime)
   	return realtime;
   } 
 
-  printf("get_time_perception: flag %u, scale %u, benchmark %lu, realtime %lu ", 
-    flag, mp->mp_dt_scale, mp->mp_dt_benchmark, realtime);
+  printf("get_time_perception(%d): flag %u, scale %u, benchmark %lu, realtime %lu, is antecedent? %d ", 
+    mp->mp_pid, flag, mp->mp_dt_scale, mp->mp_dt_benchmark, realtime, DT_CHECK(flag, DT_ANTECEDENT));
 
   if (!DT_CHECK(flag, DT_BENCHMARK)) {
   	/* Set the starting point. */
   	mp->mp_dt_flag |= DT_BENCHMARK;
   	mp->mp_dt_benchmark = realtime;
-    printf("returned %lu\n", realtime);
+    printf("benchmark returned %lu\n", realtime);
   	return realtime;
   } else if (scale == 0) {
   	/* Time is frozen. */
-    printf("returned %lu\n", benchmark);
+    printf("frozen returned %lu\n", benchmark);
   	return benchmark;
   }
 
@@ -59,13 +59,13 @@ extern clock_t get_time_perception(clock_t realtime)
   bool is_antecedent = DT_CHECK(flag, DT_ANTECEDENT); 
   scale = is_antecedent ? scale : 1 / scale;
   double res = benchmark + (realtime - benchmark) * scale;
-  printf("returned float %lu\n", (clock_t) res);
+  printf("distorted returned %lu\n", (clock_t) res);
   return benchmark + (realtime - benchmark) * scale;
 }
 
 extern void reset_time_benchmarks()
 {
-  printf("reset_time_benchmarks\n");
+  printf("reset_time_benchmarks(%d)\n", mp->mp_pid);
   for (int i = 0; i < NR_PROCS; i++) {
   	mproc[i].mp_dt_flag ^= DT_BENCHMARK;
   	mproc[i].mp_dt_benchmark = 0;
@@ -121,14 +121,16 @@ int do_distort_time()
   if (!is_descendant && !is_antecedent)
   	return EPERM; /* The target is not from caller's family. */
 
-  printf("do_distort_time: caller %d(%d); target %d(%d); scale %u; is antecedent? %d\n", 
-    caller.pid, caller.id, target.pid, target.id, scale, is_antecedent);
+  printf("do_distort_time(%d): target %d; scale %u; is antecedent? %d\n", 
+    caller.pid, target.pid, scale, is_antecedent);
 
   /* Finally... */
   struct mproc* proc = &mproc[target.id];
   proc->mp_dt_scale = scale;
+  bool is_benchmark = DT_CHECK(proc->mp_dt_flag, DT_BENCHMARK);
   proc->mp_dt_flag = DT_DISTORTED;
   proc->mp_dt_flag |= is_antecedent ? DT_ANTECEDENT : DT_DESCENDANT;
+  proc->mp_dt_flag |= is_benchmark ? DT_BENCHMARK : DT_NORMAL;
 
   return OK;
 }
