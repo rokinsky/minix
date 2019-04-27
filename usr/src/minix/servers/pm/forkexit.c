@@ -99,9 +99,13 @@ int do_fork()
 	rmc->mp_scheduler = SCHED_PROC_NR;
   }
 
+  /* Distorted time is not inherited. */
+  rmc->mp_dt_flags = 0;
+  rmc->mp_dt_scale = 0;
+  rmc->mp_dt_benchmark = 0;
+
   /* Inherit only these flags. In normal fork(), PRIV_PROC is not inherited. */
   rmc->mp_flags &= (IN_USE|DELAY_CALL|TAINTED);
-  rmc->mp_dt_flags = 0;			/* reset flags to distortion time */
   rmc->mp_child_utime = 0;		/* reset administration */
   rmc->mp_child_stime = 0;		/* reset administration */
   rmc->mp_exitstatus = 0;
