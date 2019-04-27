@@ -31,7 +31,7 @@ typedef struct {
 
 extern clock_t get_time_perception(clock_t realtime)
 {
-  uint8_t flag = mp->mp_dt_flag;
+  uint8_t flag = mp->mp_dt_flags;
   float scale = (float) mp->mp_dt_scale;
   clock_t benchmark = mp->mp_dt_benchmark;
 
@@ -40,7 +40,7 @@ extern clock_t get_time_perception(clock_t realtime)
   	return realtime;
   } else if (!DT_CHECK(flag, DT_BENCHMARK)) {
   	/* Set the starting point. */
-  	mp->mp_dt_flag |= DT_BENCHMARK;
+  	mp->mp_dt_flags |= DT_BENCHMARK;
   	mp->mp_dt_benchmark = realtime;
   	return realtime;
   } else if (scale == 0) {
@@ -57,7 +57,7 @@ extern clock_t get_time_perception(clock_t realtime)
 extern void reset_time_benchmarks()
 {
   for (int i = 0; i < NR_PROCS; i++) {
-  	mproc[i].mp_dt_flag ^= DT_BENCHMARK;
+  	mproc[i].mp_dt_flags ^= DT_BENCHMARK;
   	mproc[i].mp_dt_benchmark = 0;
   }
 }
@@ -114,10 +114,10 @@ int do_distort_time()
   /* Finally... */
   struct mproc* proc = &mproc[target.id];
   proc->mp_dt_scale = scale;
-  bool is_benchmark = DT_CHECK(proc->mp_dt_flag, DT_BENCHMARK);
-  proc->mp_dt_flag = DT_DISTORTED;
-  proc->mp_dt_flag |= is_antecedent ? DT_ANTECEDENT : DT_DESCENDANT;
-  proc->mp_dt_flag |= is_benchmark ? DT_BENCHMARK : DT_NORMAL;
+  bool was_benchmark = DT_CHECK(proc->mp_dt_flags, DT_BENCHMARK);
+  proc->mp_dt_flags = DT_DISTORTED;
+  proc->mp_dt_flags |= is_antecedent ? DT_ANTECEDENT : DT_DESCENDANT;
+  proc->mp_dt_flags |= was_benchmark ? DT_BENCHMARK : DT_NORMAL;
 
   return OK;
 }
