@@ -11,8 +11,8 @@
 #define HUSKY           NULL
 // you can tweak this
 #define SCALE1          64
-#define SCALE2          12
-#define SCALE3          34
+#define SCALE2          64
+#define SCALE3          64
 #define WAIT_1_ON_1     5
 #define WAIT_2_ON_1     12
 #define WAIT_3_ON_1     7

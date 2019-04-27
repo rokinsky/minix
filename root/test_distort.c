@@ -22,8 +22,11 @@ struct timeval subtract(struct timeval a, struct timeval b) {
 }
 
 void mysleep(double seconds) {
-	assert(0 == sleep(seconds));
-	assert(0 == usleep((seconds - (int)seconds) * 1e6));
+	// sleep() and usleep() call nanosleep() with second argument causing nanosleep() to call gettimeofday()
+	struct timespec ts;
+	ts.tv_sec = seconds;
+	ts.tv_nsec = (seconds - (int)seconds) * 1e9;
+	assert(0 == nanosleep(&ts, NULL)); // This does not call gettimeofday()
 }
 
 void print_current_time_from_tv(struct timeval tv) {
@@ -67,13 +70,20 @@ void do_sleep_for(double seconds, double expected_diff, int line) {
 	do_check_diff_impl(before, after, expected_diff, "awaken after");
 }
 
+void assert_wait() {
+	int status;
+	assert(wait(&status) != -1);
+	assert(WIFEXITED(status));
+	assert(WEXITSTATUS(status) == 0);
+}
+
 void distort_my_time_from_child(int scale) {
 	if (fork() == 0) {
 		assert(distort_time(getppid(), scale) == 0);
 		_exit(0);
 	}
 
-	wait(NULL);
+	assert_wait();
 }
 
 void distort_time_of(pid_t pid, int scale) {
@@ -161,7 +171,7 @@ void test3() {
 			exit(0);
 		}
 
-		wait(NULL);
+		assert_wait();
 		exit(0);
 	}
 
@@ -198,7 +208,7 @@ void test3() {
 	mysleep(1);
 	// Sync 10
 
-	wait(NULL);
+	assert_wait();
 }
 
 // Checks distorting time of parent by 1
@@ -207,7 +217,7 @@ void test4() {
 
 	distort_my_time_from_child(2);
 	resettimeofday();
-	
+
 	sleep_for(1, 0.5);
 
 	assert(0 == gettimeofday(&beg, NULL));
@@ -222,7 +232,7 @@ void test4() {
 	assert(0 == gettimeofday(&beg, NULL));
 	distort_my_time_from_child(1);
 	assert(0 == gettimeofday(&end, NULL));
-	check_diff(beg, end, 0.5);	
+	check_diff(beg, end, 0.5);
 }
 
 // Checks unsuccessful calls to PM_CLOCK_SETTIME
@@ -249,12 +259,95 @@ void test5() {
 	check_diff(beg, end, 1);
 }
 
+// Checks timepoint setting
+void test6() {
+	if (fork() == 0) {
+		// New process is not distorted and no time point is set
+		struct timeval beg, end;
+		assert(0 == gettimeofday(&beg, NULL));
+
+		sleep_for(0.5, 0.5);
+		distort_my_time_from_child(0);
+		mysleep(0.5);
+
+		assert(0 == gettimeofday(&end, NULL)); // Time point is set now
+		check_diff(beg, end, 1);
+
+		sleep_for(0.5, 0);
+
+		_exit(0);
+	}
+	assert_wait();
+
+	if (fork() == 0) {
+		// New process is not distorted and no time point is set
+		struct timeval beg, end;
+		assert(0 == gettimeofday(&beg, NULL));
+
+		sleep_for(0.5, 0.5);
+		distort_my_time_from_child(1);
+		sleep_for(0.5, 0.5);
+
+		assert(0 == gettimeofday(&end, NULL));
+		check_diff(beg, end, 1);
+
+		sleep_for(0.5, 0.5);
+
+		distort_my_time_from_child(0); // Time point does not change
+		assert(0 == gettimeofday(&end, NULL));
+		check_diff(beg, end, 0.5);
+
+		_exit(0);
+	}
+	assert_wait();
+
+	if (fork() == 0) {
+		// New process is not distorted and no time point is set
+		struct timeval beg, end;
+		assert(0 == gettimeofday(&beg, NULL));
+
+		sleep_for(0.5, 0.5);
+		distort_my_time_from_child(2);
+		mysleep(0.5);
+
+		assert(0 == gettimeofday(&end, NULL));
+		check_diff(beg, end, 1);
+
+		sleep_for(0.5, 0.25);
+
+		_exit(0);
+	}
+	assert_wait();
+
+	if (fork() == 0) {
+		// New process is not distorted and no time point is set
+		struct timeval beg, end;
+
+		distort_my_time_from_child(4);
+		sleep_for(0.4, 0.1);
+
+		assert(0 == gettimeofday(&beg, NULL));
+		resettimeofday(); // Time point is reseted
+		
+		mysleep(1);
+
+		assert(0 == gettimeofday(&end, NULL)); // Time point is set now
+		check_diff(beg, end, 1);
+
+		sleep_for(0.4, 0.1);
+
+		_exit(0);
+	}
+	assert_wait();
+}
+
 int main() {
 	test1();
 	test2();
 	test3();
 	test4();
 	test5();
+	test6();
 
 	printf("\033[1;32mAll tests passed!\033[m\n");
 }
