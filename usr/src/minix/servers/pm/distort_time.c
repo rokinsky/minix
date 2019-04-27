@@ -38,34 +38,24 @@ extern clock_t get_time_perception(clock_t realtime)
   if (!DT_CHECK(flag, DT_DISTORTED)) {
   	/* Nothing happens. */
   	return realtime;
-  } 
-
-  printf("get_time_perception(%d): flag %u, scale %u, benchmark %lu, realtime %lu, is antecedent? %d ", 
-    mp->mp_pid, flag, mp->mp_dt_scale, mp->mp_dt_benchmark, realtime, DT_CHECK(flag, DT_ANTECEDENT));
-
-  if (!DT_CHECK(flag, DT_BENCHMARK)) {
+  } else if (!DT_CHECK(flag, DT_BENCHMARK)) {
   	/* Set the starting point. */
   	mp->mp_dt_flag |= DT_BENCHMARK;
   	mp->mp_dt_benchmark = realtime;
-    printf("benchmark returned %lu\n", realtime);
   	return realtime;
   } else if (scale == 0) {
   	/* Time is frozen. */
-    printf("frozen returned %lu\n", benchmark);
   	return benchmark;
   }
 
   /* Let's distort! */
-  bool is_antecedent = DT_CHECK(flag, DT_ANTECEDENT); 
+  bool is_antecedent = DT_CHECK(flag, DT_ANTECEDENT);
   scale = is_antecedent ? scale : 1 / scale;
-  float res = benchmark + (realtime - benchmark) * scale;
-  printf("distorted returned %lu\n", (clock_t) res);
   return benchmark + (realtime - benchmark) * scale;
 }
 
 extern void reset_time_benchmarks()
 {
-  printf("reset_time_benchmarks(%d)\n", mp->mp_pid);
   for (int i = 0; i < NR_PROCS; i++) {
   	mproc[i].mp_dt_flag ^= DT_BENCHMARK;
   	mproc[i].mp_dt_benchmark = 0;
@@ -120,9 +110,6 @@ int do_distort_time()
 
   if (!is_descendant && !is_antecedent)
   	return EPERM; /* The target is not from caller's family. */
-
-  printf("do_distort_time(%d): target %d; scale %u; is antecedent? %d\n", 
-    caller.pid, target.pid, scale, is_antecedent);
 
   /* Finally... */
   struct mproc* proc = &mproc[target.id];
