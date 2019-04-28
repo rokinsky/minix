@@ -7,7 +7,6 @@ static int _distortcall(message *m)
   m->m_type = PM_DISTORT_TIME;
 
   int status = ipc_sendrec(PM_PROC_NR, m);
-
   if (status != 0) m->m_type = status;
 
   return m->m_type < 0 ? -m->m_type : m->m_type;
