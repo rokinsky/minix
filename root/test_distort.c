@@ -12,6 +12,8 @@
 #include <unistd.h>
 #include <minix/config.h>
 
+double mdiff = 0;
+
 struct timeval subtract(struct timeval a, struct timeval b) {
 	struct timeval res = {a.tv_sec - b.tv_sec, a.tv_usec - b.tv_usec};
 	if (res.tv_usec < 0) {
@@ -43,11 +45,13 @@ void print_current_time() {
 
 void do_check_diff_impl(struct timeval beg, struct timeval end, double expected_diff, const char* msg) {
 	struct timeval diff = subtract(end, beg);
-	double ddiff = diff.tv_sec + diff.tv_usec / 1e6;
-	printf("%s: %.6lf\n", msg, ddiff);
+	double ddiff = diff.tv_sec + diff.tv_usec / 1e6, absdiff = fabs(ddiff - expected_diff);
+	printf("%s: %.6lf [%.6lf]\n", msg, ddiff, absdiff);
+	if (absdiff > mdiff)
+		mdiff = absdiff;
 	print_current_time_from_tv(end);
 	fflush(stdout);
-	assert(fabs(ddiff - expected_diff) < 0.04);
+	assert(absdiff < 0.04);
 }
 
 #define check_diff(beg, end, exp_df) do_check_diff(beg, end, exp_df, __LINE__)
@@ -344,7 +348,7 @@ void test6() {
 
 void test7() {
 	int i;
-	for(i = 0; i < NR_PROCS; i++) {
+	for (i = 0; i < NR_PROCS; i++) {
 		if (fork() == 0) {
 			struct timeval tv;
 			distort_my_time_from_child(0);
@@ -355,7 +359,7 @@ void test7() {
 			assert_wait();
 		}
 	}
-	for(i = 0; i < NR_PROCS; i++) {
+	for (i = 0; i < NR_PROCS; i++) {
 		if (fork() == 0) {
 			struct timeval tv1, tv2;
 			assert(0 == gettimeofday(&tv1, NULL));
@@ -364,7 +368,7 @@ void test7() {
 			assert(tv1.tv_usec != tv2.tv_usec || tv1.tv_sec != tv2.tv_sec);
 			exit(0);
 		} else {
-		assert_wait();
+			assert_wait();
 		}
 	}
 }
@@ -378,5 +382,5 @@ int main() {
 	test6();
 	test7();
 
-	printf("\033[1;32mAll tests passed!\033[m\n");
+	printf("\033[1;32mAll tests passed! Max diff: %.16lf\033[m\n", mdiff);
 }
