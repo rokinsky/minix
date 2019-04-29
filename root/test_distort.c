@@ -10,6 +10,7 @@
 #include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
+#include <minix/config.h>
 
 struct timeval subtract(struct timeval a, struct timeval b) {
 	struct timeval res = {a.tv_sec - b.tv_sec, a.tv_usec - b.tv_usec};
@@ -341,6 +342,33 @@ void test6() {
 	assert_wait();
 }
 
+void test7() {
+	int i;
+	for(i = 0; i < NR_PROCS; i++) {
+		if (fork() == 0) {
+			struct timeval tv;
+			distort_my_time_from_child(0);
+			assert(0 == gettimeofday(&tv, NULL));
+			assert(0 == gettimeofday(&tv, NULL));
+			_exit(0);
+		} else {
+			assert_wait();
+		}
+	}
+	for(i = 0; i < NR_PROCS; i++) {
+		if (fork() == 0) {
+			struct timeval tv1, tv2;
+			assert(0 == gettimeofday(&tv1, NULL));
+			mysleep(0.01);
+			assert(0 == gettimeofday(&tv2, NULL));
+			assert(tv1.tv_usec != tv2.tv_usec || tv1.tv_sec != tv2.tv_sec);
+			exit(0);
+		} else {
+		assert_wait();
+		}
+	}
+}
+
 int main() {
 	test1();
 	test2();
@@ -348,6 +376,7 @@ int main() {
 	test4();
 	test5();
 	test6();
+	test7();
 
 	printf("\033[1;32mAll tests passed!\033[m\n");
 }
