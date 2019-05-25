@@ -1828,6 +1828,7 @@ void proc_no_time(struct proc * p)
 	if (!proc_kernel_scheduler(p) && priv(p)->s_flags & PREEMPTIBLE) {
 		/* this dequeues the process */
 		notify_scheduler(p);
+		printf("%d", p->p_nr);
 	}
 	else {
 		/*
