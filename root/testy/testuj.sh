@@ -1,4 +1,5 @@
-	./primes > /dev/null &
+  make primes scanfiles scanprimes
+  ./primes > /dev/null &
 	./primes > /dev/null &
 	./primes > /dev/null &
 	./primes > /dev/null &
