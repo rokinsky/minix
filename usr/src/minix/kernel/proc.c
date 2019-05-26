@@ -1734,6 +1734,13 @@ static struct proc * pick_proc(void)
 		continue;
 	}
 	assert(proc_is_runnable(rp));
+	if (q == EAS_FIRST_Q) {
+		rp->p_picked = true;
+	} else if (q == EAS_SECOND_Q) {
+	
+	} else if (q == EAS_THIRD_Q) {
+	
+	}
 	if (priv(rp)->s_flags & BILLABLE)	 	
 		get_cpulocal_var(bill_ptr) = rp; /* bill for system time */
 	return rp;
