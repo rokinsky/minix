@@ -618,7 +618,7 @@ void kernel_call_resume(struct proc *caller)
 /*===========================================================================*
  *                               sched_proc                                  *
  *===========================================================================*/
-int sched_proc(struct proc *p,
+int sched_proc(struct proc *p, /* eas_2019 */
 			int priority,
 			int quantum,
 			int cpu)
@@ -659,8 +659,10 @@ int sched_proc(struct proc *p,
 	if (proc_is_runnable(p))
 		RTS_SET(p, RTS_NO_QUANTUM);
 
-	if (priority != -1)
+	if (priority != -1) {
 		p->p_priority = priority;
+    p->p_picked = false;
+	}
 	if (quantum != -1) {
 		p->p_quantum_size_ms = quantum;
 		p->p_cpu_time_left = ms_2_cpu_time(quantum);

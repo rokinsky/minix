@@ -1543,7 +1543,6 @@ void enqueue( /* eas_2019 */
 
   assert(q >= 0);
 
-  rp->p_picked = FALSE;
   rdy_head = get_cpu_var(rp->p_cpu, run_q_head);
   rdy_tail = get_cpu_var(rp->p_cpu, run_q_tail);
 
