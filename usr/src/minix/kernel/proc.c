@@ -1710,12 +1710,6 @@ void dequeue(struct proc *rp)
 #endif
 }
 
-static struct proc * pick_proc_eas(unsigned q) {
-	struct proc **rdy_head;
-	rdy_head = get_cpulocal_var(run_q_head);
-	return rdy_head[q];
-}
-
 /*===========================================================================*
  *				pick_proc				     * 
  *===========================================================================*/
@@ -1736,21 +1730,20 @@ static struct proc * pick_proc(void) /* eas_2019 */
    * If there are no processes ready to run, return NULL.
    */
   rdy_head = get_cpulocal_var(run_q_head);
-  for (q=0; q < EAS_FIRST_Q; q++) {	
+  for (q=0; q < NR_SCHED_QUEUES; q++) {	
 	if(!(rp = rdy_head[q])) {
 		TRACE(VF_PICKPROC, printf("cpu %d queue %d empty\n", cpuid, q););
 		continue;
 	}
 	assert(proc_is_runnable(rp));
+
+	if(q >= EAS_FIRST_Q && q <= EAS_THIRD_Q && rp->p_picked) {
+		continue;
+	}
+
 	if (priv(rp)->s_flags & BILLABLE)	 	
 		get_cpulocal_var(bill_ptr) = rp; /* bill for system time */
 	return rp;
-  }
-
-  for (q=EAS_FIRST_Q; q <= EAS_THIRD_Q; q++) {
-	if ((rp = rdy_head[q]) && !rp->p_picked) {
-		return rp;
-	}
   }
 
   unpick_queue(EAS_FIRST_Q);
@@ -1862,7 +1855,7 @@ static void unpick_queue(unsigned q) {
 	}
 }
 
-void proc_no_time(struct proc * p) /* eas_2019 */
+void proc_no_time(struct proc * p)
 {
 	if (!proc_kernel_scheduler(p) && priv(p)->s_flags & PREEMPTIBLE) {
 		/* this dequeues the process */

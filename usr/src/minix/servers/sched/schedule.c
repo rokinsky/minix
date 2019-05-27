@@ -104,12 +104,15 @@ int do_noquantum(message *m_ptr) /* eas_2019 */
 	if (rmp->priority == EAS_FIRST_Q && rmp->times == EAS_FIRST_T) {
 		rmp->priority = EAS_SECOND_Q;
 		rmp->times = 0;
+		printf("do_noquantum: process=%d has been switched from I to II\n", proc_nr_n);
 	} else if (rmp->priority == EAS_SECOND_Q && rmp->times == EAS_SECOND_T) {
 		rmp->priority = EAS_THIRD_Q;
 		rmp->times = 0;
+		printf("do_noquantum: process=%d has been switched from III to II\n", proc_nr_n);
 	} else if (rmp->priority == EAS_THIRD_Q && rmp->times == EAS_THIRD_T) {
 		rmp->priority = EAS_FIRST_Q;
 		rmp->times = 0;
+		printf("do_noquantum: process=%d has been switched from III to I\n", proc_nr_n);
 	}
 
 	if ((rv = schedule_process_local(rmp)) != OK) {
