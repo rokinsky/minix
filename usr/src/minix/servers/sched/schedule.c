@@ -100,6 +100,7 @@ int do_noquantum(message *m_ptr) /* eas_2019 */
 
 	rmp = &schedproc[proc_nr_n];
 	rmp->times++;
+	printf("do_noquantum: process=%d, times=%d, priority=%d\n", proc_nr_n, rmp->times, rmp->priority);
 	if (rmp->priority == EAS_FIRST_Q && rmp->times == EAS_FIRST_T) {
 		rmp->priority = EAS_SECOND_Q;
 		rmp->times = 0;
