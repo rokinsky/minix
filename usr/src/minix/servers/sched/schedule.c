@@ -87,7 +87,7 @@ static void pick_cpu(struct schedproc * proc)
  *				do_noquantum				     *
  *===========================================================================*/
 
-int do_noquantum(message *m_ptr)
+int do_noquantum(message *m_ptr) /* eas_2019 */
 {
 	register struct schedproc *rmp;
 	int rv, proc_nr_n;
@@ -99,8 +99,13 @@ int do_noquantum(message *m_ptr)
 	}
 
 	rmp = &schedproc[proc_nr_n];
-	if (rmp->priority < MIN_USER_Q) {
-		rmp->priority += 1; /* lower priority */
+	rmp->times++;
+	if (rmp->priority == EAS_FIRST_Q && rmp->times == EAS_FIRST_T) {
+		rmp->priority = EAS_SECOND_Q;
+	} else if (rmp->priority == EAS_SECOND_Q && rmp->times == EAS_SECOND_T) {
+		rmp->priority = EAS_THIRD_Q;
+	} else if (rmp->priority == EAS_THIRD_Q && rmp->times == EAS_THIRD_T) {
+		rmp->priority = EAS_FIRST_Q;
 	}
 
 	if ((rv = schedule_process_local(rmp)) != OK) {
@@ -349,14 +354,15 @@ void init_scheduling(void)
  * quantum. This function will find all proccesses that have been bumped down,
  * and pulls them back up. This default policy will soon be changed.
  */
-static void balance_queues(minix_timer_t *tp)
+static void balance_queues(minix_timer_t *tp) /* eas_2019 */
 {
 	struct schedproc *rmp;
 	int proc_nr;
 
 	for (proc_nr=0, rmp=schedproc; proc_nr < NR_PROCS; proc_nr++, rmp++) {
 		if (rmp->flags & IN_USE) {
-			if (rmp->priority > rmp->max_priority) {
+			if (rmp->priority > rmp->max_priority && 
+			!(rpm->priority >= EAS_FIRST_Q && rpm->priority <= EAS_THIRD_Q)) {
 				rmp->priority -= 1; /* increase priority */
 				schedule_process_local(rmp);
 			}

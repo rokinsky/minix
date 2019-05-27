@@ -67,8 +67,13 @@
 #define MIN_USER_Q	  (NR_SCHED_QUEUES - 1)	/* minimum priority for user
 						   processes */
 #define EAS_FIRST_Q	USER_Q
-#define	EAS_SECOND_Q	EAS_FIRST_Q + 1
+#define EAS_SECOND_Q	EAS_FIRST_Q + 1
 #define EAS_THIRD_Q	EAS_SECOND_Q + 1
+
+#define EAS_FIRST_T	5
+#define EAS_SECOND_T	10
+#define EAS_THIRD_T	20
+
 /* default scheduling quanta */
 #define USER_QUANTUM 200
 

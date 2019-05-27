@@ -1752,9 +1752,8 @@ static struct proc * pick_proc(void) /* eas_2019 */
 	}
   }
 
-  if (rdy_head[EAS_FIRST] && rdy_head[EAS_FIRST]->p_picked) {
-
-  }
+  unpick_queue(EAS_FIRST_Q);
+  unpick_queue(EAS_SECOND_Q);
 
   return NULL;
 }
@@ -1835,11 +1834,16 @@ static void notify_scheduler(struct proc *p) /* eas_2019 */
 	/* Reset accounting */
 	reset_proc_accounting(p);
 
+	if (p->p_priority == EAS_FIRST_Q || p->p_priority == EAS_SECOND_Q) {
+		p->p_picked = true;
+	}
+
 	if (p->p_priority == EAS_SECOND_Q) {
-		if (p->p_nextready && p->p_nextready->p_picked) {
-			unpick_queue(EAS_SECOND_Q);
+		if (p->p_nextready && !p->p_nextready->p_picked) {
+			unpick_queue(EAS_FIRST_Q);
 		}
 	} else if (p->p_priority == EAS_THIRD_Q) {
+		unpick_queue(EAS_FIRST_Q);
 		unpick_queue(EAS_SECOND_Q);
 	}
 
@@ -1861,7 +1865,6 @@ void proc_no_time(struct proc * p) /* eas_2019 */
 {
 	if (!proc_kernel_scheduler(p) && priv(p)->s_flags & PREEMPTIBLE) {
 		/* this dequeues the process */
-		p->p_picked = true;
 		notify_scheduler(p);
 	}
 	else {
