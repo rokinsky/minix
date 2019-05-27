@@ -100,19 +100,19 @@ int do_noquantum(message *m_ptr) /* eas_2019 */
 
 	rmp = &schedproc[proc_nr_n];
 	rmp->times++;
-	printf("do_noquantum: process=%d, times=%d, priority=%d\n", proc_nr_n, rmp->times, rmp->priority);
+	// printf("do_noquantum: process=%d, times=%d, priority=%d\n", proc_nr_n, rmp->times, rmp->priority);
 	if (rmp->priority == EAS_FIRST_Q && rmp->times == EAS_FIRST_T) {
 		rmp->priority = EAS_SECOND_Q;
 		rmp->times = 0;
-		printf("do_noquantum: process=%d has been switched from I to II\n", proc_nr_n);
+		// printf("do_noquantum: process=%d has been switched from I to II\n", proc_nr_n);
 	} else if (rmp->priority == EAS_SECOND_Q && rmp->times == EAS_SECOND_T) {
 		rmp->priority = EAS_THIRD_Q;
 		rmp->times = 0;
-		printf("do_noquantum: process=%d has been switched from III to II\n", proc_nr_n);
+		// printf("do_noquantum: process=%d has been switched from III to II\n", proc_nr_n);
 	} else if (rmp->priority == EAS_THIRD_Q && rmp->times == EAS_THIRD_T) {
 		rmp->priority = EAS_FIRST_Q;
 		rmp->times = 0;
-		printf("do_noquantum: process=%d has been switched from III to I\n", proc_nr_n);
+		// printf("do_noquantum: process=%d has been switched from III to I\n", proc_nr_n);
 	}
 
 	if ((rv = schedule_process_local(rmp)) != OK) {
@@ -176,6 +176,7 @@ int do_start_scheduling(message *m_ptr)
 	rmp->endpoint     = m_ptr->m_lsys_sched_scheduling_start.endpoint;
 	rmp->parent       = m_ptr->m_lsys_sched_scheduling_start.parent;
 	rmp->max_priority = m_ptr->m_lsys_sched_scheduling_start.maxprio;
+	rmp->times        = 0;
 	if (rmp->max_priority >= NR_SCHED_QUEUES) {
 		return EINVAL;
 	}
