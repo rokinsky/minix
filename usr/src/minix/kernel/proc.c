@@ -61,6 +61,7 @@ static int try_async(struct proc *caller_ptr);
 static int try_one(struct proc *src_ptr, struct proc *dst_ptr);
 static struct proc * pick_proc(void);
 static void enqueue_head(struct proc *rp);
+static void unpick_queue(unsigned q);
 
 /* all idles share the same idle_priv structure */
 static struct priv idle_priv;
@@ -1856,7 +1857,7 @@ static void notify_scheduler(struct proc *p) /* eas_2019 */
 static void unpick_queue(unsigned q) {
 	struct proc **rdy_head;
 	rdy_head = get_cpulocal_var(run_q_head);
-	for (struct proc *p = rdy_head[q]; *p; *p = p->p_nextready) {
+	for (struct proc *p = rdy_head[q]; p; p = p->p_nextready) {
 		p->p_picked = FALSE;
 	}
 }
