@@ -661,7 +661,7 @@ int sched_proc(struct proc *p, /* eas_2019 */
 
 	if (priority != -1) {
 		p->p_priority = priority;
-    p->p_picked = false;
+    p->p_picked = FALSE;
 	}
 	if (quantum != -1) {
 		p->p_quantum_size_ms = quantum;
