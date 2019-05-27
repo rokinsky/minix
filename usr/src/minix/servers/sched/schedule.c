@@ -102,10 +102,13 @@ int do_noquantum(message *m_ptr) /* eas_2019 */
 	rmp->times++;
 	if (rmp->priority == EAS_FIRST_Q && rmp->times == EAS_FIRST_T) {
 		rmp->priority = EAS_SECOND_Q;
+		rmp->times = 0;
 	} else if (rmp->priority == EAS_SECOND_Q && rmp->times == EAS_SECOND_T) {
 		rmp->priority = EAS_THIRD_Q;
+		rmp->times = 0;
 	} else if (rmp->priority == EAS_THIRD_Q && rmp->times == EAS_THIRD_T) {
 		rmp->priority = EAS_FIRST_Q;
+		rmp->times = 0;
 	}
 
 	if ((rv = schedule_process_local(rmp)) != OK) {
