@@ -1542,7 +1542,7 @@ void enqueue( /* eas_2019 */
 
   assert(q >= 0);
 
-  rp->p_picked = false;
+  rp->p_picked = FALSE;
   rdy_head = get_cpu_var(rp->p_cpu, run_q_head);
   rdy_tail = get_cpu_var(rp->p_cpu, run_q_tail);
 
@@ -1835,7 +1835,7 @@ static void notify_scheduler(struct proc *p) /* eas_2019 */
 	reset_proc_accounting(p);
 
 	if (p->p_priority == EAS_FIRST_Q || p->p_priority == EAS_SECOND_Q) {
-		p->p_picked = true;
+		p->p_picked = TRUE;
 	}
 
 	if (p->p_priority == EAS_SECOND_Q) {
@@ -1857,7 +1857,7 @@ static void unpick_queue(unsigned q) {
 	struct proc **rdy_head;
 	rdy_head = get_cpulocal_var(run_q_head);
 	for (struct proc *p = rdy_head[q]; *p; *p = p->p_nextready) {
-		p->p_picked = false;
+		p->p_picked = FALSE;
 	}
 }
 

@@ -362,7 +362,7 @@ static void balance_queues(minix_timer_t *tp) /* eas_2019 */
 	for (proc_nr=0, rmp=schedproc; proc_nr < NR_PROCS; proc_nr++, rmp++) {
 		if (rmp->flags & IN_USE) {
 			if (rmp->priority > rmp->max_priority && 
-			!(rpm->priority >= EAS_FIRST_Q && rpm->priority <= EAS_THIRD_Q)) {
+			!(rmp->priority >= EAS_FIRST_Q && rmp->priority <= EAS_THIRD_Q)) {
 				rmp->priority -= 1; /* increase priority */
 				schedule_process_local(rmp);
 			}
