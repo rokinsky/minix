@@ -1847,6 +1847,7 @@ static void notify_scheduler(struct proc *p) /* eas_2019 */
 }
 
 static void unpick_queue(unsigned q) {
+	printf("unpick_queue: %d", q);
 	struct proc **rdy_head;
 	rdy_head = get_cpulocal_var(run_q_head);
 	for (struct proc *p = rdy_head[q]; p; p = p->p_nextready) {
