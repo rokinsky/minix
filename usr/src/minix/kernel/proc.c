@@ -1523,7 +1523,7 @@ asyn_error:
 /*===========================================================================*
  *				enqueue					     * 
  *===========================================================================*/
-void enqueue(
+void enqueue( /* eas_2019 */
   register struct proc *rp	/* this process is now runnable */
 )
 {
@@ -1542,6 +1542,7 @@ void enqueue(
 
   assert(q >= 0);
 
+  rp->p_picked = false;
   rdy_head = get_cpu_var(rp->p_cpu, run_q_head);
   rdy_tail = get_cpu_var(rp->p_cpu, run_q_tail);
 
@@ -1708,10 +1709,16 @@ void dequeue(struct proc *rp)
 #endif
 }
 
+static struct proc * pick_proc_eas(unsigned q) {
+	struct proc **rdy_head;
+	rdy_head = get_cpulocal_var(run_q_head);
+	return rdy_head[q];
+}
+
 /*===========================================================================*
  *				pick_proc				     * 
  *===========================================================================*/
-static struct proc * pick_proc(void)
+static struct proc * pick_proc(void) /* eas_2019 */
 {
 /* Decide who to run now.  A new process is selected an returned.
  * When a billable process is selected, record it in 'bill_ptr', so that the 
@@ -1728,23 +1735,27 @@ static struct proc * pick_proc(void)
    * If there are no processes ready to run, return NULL.
    */
   rdy_head = get_cpulocal_var(run_q_head);
-  for (q=0; q < NR_SCHED_QUEUES; q++) {	
+  for (q=0; q < EAS_FIRST_Q; q++) {	
 	if(!(rp = rdy_head[q])) {
 		TRACE(VF_PICKPROC, printf("cpu %d queue %d empty\n", cpuid, q););
 		continue;
 	}
 	assert(proc_is_runnable(rp));
-	if (q == EAS_FIRST_Q) {
-		rp->p_picked = true;
-	} else if (q == EAS_SECOND_Q) {
-	
-	} else if (q == EAS_THIRD_Q) {
-	
-	}
 	if (priv(rp)->s_flags & BILLABLE)	 	
 		get_cpulocal_var(bill_ptr) = rp; /* bill for system time */
 	return rp;
   }
+
+  for (q=EAS_FIRST_Q; q <= EAS_THIRD_Q; q++) {
+	if ((rp = rdy_head[q]) && !rp->p_picked) {
+		return rp;
+	}
+  }
+
+  if (rdy_head[EAS_FIRST] && rdy_head[EAS_FIRST]->p_picked) {
+
+  }
+
   return NULL;
 }
 
@@ -1797,7 +1808,7 @@ const int fatalflag;
 	return ok;
 }
 
-static void notify_scheduler(struct proc *p)
+static void notify_scheduler(struct proc *p) /* eas_2019 */
 {
 	message m_no_quantum;
 	int err;
@@ -1824,18 +1835,34 @@ static void notify_scheduler(struct proc *p)
 	/* Reset accounting */
 	reset_proc_accounting(p);
 
+	if (p->p_priority == EAS_SECOND_Q) {
+		if (p->p_nextready && p->p_nextready->p_picked) {
+			unpick_queue(EAS_SECOND_Q);
+		}
+	} else if (p->p_priority == EAS_THIRD_Q) {
+		unpick_queue(EAS_SECOND_Q);
+	}
+
 	if ((err = mini_send(p, p->p_scheduler->p_endpoint,
 					&m_no_quantum, FROM_KERNEL))) {
 		panic("WARNING: Scheduling: mini_send returned %d\n", err);
 	}
 }
 
-void proc_no_time(struct proc * p)
+static void unpick_queue(unsigned q) {
+	struct proc **rdy_head;
+	rdy_head = get_cpulocal_var(run_q_head);
+	for (struct proc *p = rdy_head[q]; *p; *p = p->p_nextready) {
+		p->p_picked = false;
+	}
+}
+
+void proc_no_time(struct proc * p) /* eas_2019 */
 {
 	if (!proc_kernel_scheduler(p) && priv(p)->s_flags & PREEMPTIBLE) {
 		/* this dequeues the process */
+		p->p_picked = true;
 		notify_scheduler(p);
-		printf("%d", p->p_nr);
 	}
 	else {
 		/*
