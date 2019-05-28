@@ -152,7 +152,7 @@ int do_stop_scheduling(message *m_ptr)
 /*===========================================================================*
  *				do_start_scheduling			     *
  *===========================================================================*/
-int do_start_scheduling(message *m_ptr)
+int do_start_scheduling(message *m_ptr) /* eas_2019 */
 {
 	register struct schedproc *rmp;
 	int rv, proc_nr_n, parent_nr_n;
