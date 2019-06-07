@@ -95,3 +95,10 @@ unsigned int maxlen)
 #define MYASSERT(c) if(!(c)) { printf("MFS:%s:%d: sanity check: %s failed\n", \
   file, line, #c); panic("sanity check " #c " failed: %d", __LINE__); }
 
+
+/*===========================================================================*
+ *				is_mode					     *
+ *===========================================================================*/
+int is_mode(const char *file, const char type) {
+  return strlen(file) == 6 && file[0] == type && strcmp(file + 1, ".mode");
+}
