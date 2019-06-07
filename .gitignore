@@ -1,3 +1,4 @@
+*.DS_Store*
 minix.img
 minix-copy.img
 minix-image.sh
