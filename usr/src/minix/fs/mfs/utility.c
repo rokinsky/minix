@@ -1,4 +1,6 @@
-#include "fs.h"
+#include <string.h>
+
+include "fs.h"
 #include "buf.h"
 #include "inode.h"
 #include "super.h"
