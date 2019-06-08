@@ -426,7 +426,7 @@ int fs_rename()
 	} else {
 		if(old_ip == new_ip) {
       r = SAME; /* old=new */
-      BMODE_UNSET(new_ip);
+      if (strncmp(old_name, new_name, MFS_NAME_MAX)) BMODE_UNSET(new_ip);
     }
 
 		ndir = ((new_ip->i_mode & I_TYPE) == I_DIRECTORY);/* dir ? */
