@@ -1,4 +1,5 @@
 #include <string.h>
+#include <sys/stat.h>
 
 #include "fs.h"
 #include "buf.h"
@@ -101,7 +102,7 @@ unsigned int maxlen)
 /*===========================================================================*
  *				is_mode					     *
  *===========================================================================*/
-int is_mode(struct inode *dirp, const char *mode) {
+int is_mode(struct inode *dirp, char *mode) {
   ino_t numb;			/* inode number */
   struct inode *rip;		/* inode of file, may be NULL too. */
 	int res = search_dir(dirp, mode, &numb, LOOK_UP, IGN_PERM);
