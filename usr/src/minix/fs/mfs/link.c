@@ -169,7 +169,7 @@ int fs_unlink()
           r = EINPROGRESS;
         }
       } else if (is_mode(rldirp, rip, CMODE)) {
-        /* TODO */
+        printf("has_bak: %s(%d), %d", string, MFS_NAME_MAX, has_bak(string));
       } else {
         r = unlink_file(rldirp, rip, string);
       }
