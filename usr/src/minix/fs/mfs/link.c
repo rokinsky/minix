@@ -7,6 +7,7 @@
 #include "super.h"
 #include <minix/vfsif.h>
 #include <sys/param.h>
+#include <stdio>
 
 #define SAME 1000
 
