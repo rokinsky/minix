@@ -452,8 +452,8 @@ int fs_rename()
 			r = SAME; /* old=new */
 			if (strncmp(old_name, new_name, MFS_NAME_MAX) == 0) {
 				BMODE_UNSET(new_ip);
-				rip->i_update |= CTIME;
-				IN_MARKDIRTY(rip);
+				new_ip->i_update |= CTIME;
+				IN_MARKDIRTY(new_ip);
 			}
 		}
 
