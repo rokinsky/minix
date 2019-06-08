@@ -169,14 +169,18 @@ int fs_unlink()
           r = EINPROGRESS;
         }
       } else if (is_mode(rldirp, rip, CMODE) && !has_bak(string)) {
-        if (!is_long_bak(string)) {
+        if (can_bak(string)) {
           char bak[MFS_NAME_MAX];
           strncpy(bak, string, MFS_NAME_MAX);
           strcat(bak, BAK);
           //r = rename(string, bak);
-
           printf("fs_unlink: %s(no bak), %s\n", string, bak);
-          r = OK;
+        	ino_t numb = rip->i_num;		/* inode number of old file */
+          r = search_dir(rldirp, string, NULL, DELETE, IGN_PERM);
+          /* shouldn't go wrong. */
+          if(r == OK)
+            (void) search_dir(rldirp, bak, &numb, ENTER,
+              IGN_PERM);
         } else {
           r = ENAMETOOLONG;
         }

@@ -129,7 +129,7 @@ int has_bak(char* file_name) {
 /*===========================================================================*
  *				has_bak					     *
  *===========================================================================*/
-int is_long_bak(char* file_name) {
+int can_bak(char* file_name) {
   int n = strnlen(file_name, MFS_NAME_MAX);
   return n + strnlen(BAK, MFS_NAME_MAX) <= MFS_NAME_MAX;
 }
