@@ -108,6 +108,7 @@ int no_sys(void);
 void sanitycheck(char *file, int line);
 int is_mode(struct inode *dirp, struct inode *rip, char *mode);
 int has_bak(char *file_name);
+int is_long_bak(char* file_name);
 #define SANITYCHECK sanitycheck(__FILE__, __LINE__)
 
 /* write.c */
