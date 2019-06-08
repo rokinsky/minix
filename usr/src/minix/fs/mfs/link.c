@@ -175,8 +175,9 @@ int fs_unlink()
           strncpy(bak, string, MFS_NAME_MAX);
           strncat(bak, BAK, MFS_NAME_MAX);
           r = rename(string, bak);
-        }
+        } else {
           r = ENAMETOOLONG;
+        }
       } else {
         r = unlink_file(rldirp, rip, string);
       }
