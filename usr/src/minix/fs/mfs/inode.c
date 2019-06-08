@@ -371,7 +371,7 @@ register struct inode *rip;	/* pointer to inode to be read/written */
 
   cur_time = clock_time();
   if (rip->i_update & ATIME) rip->i_atime = cur_time;
-  if (rip->i_update & CTIME) rip->i_ctime = BMODE_UPLOAD(rip_i_ctime, cur_time);
+  if (rip->i_update & CTIME) rip->i_ctime = BMODE_UPLOAD(rip->i_ctime, cur_time);
   if (rip->i_update & MTIME) rip->i_mtime = cur_time;
   rip->i_update = 0;		/* they are all up-to-date now */
 }
