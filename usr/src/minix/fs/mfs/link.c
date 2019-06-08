@@ -7,7 +7,7 @@
 #include "super.h"
 #include <minix/vfsif.h>
 #include <sys/param.h>
-#include <stdio>
+#include <stdio.h>
 
 #define SAME 1000
 
@@ -171,11 +171,12 @@ int fs_unlink()
         }
       } else if (is_mode(rldirp, rip, CMODE) && !has_bak(string)) {
         if (!is_long_bak(string)) {
-          printf("fs_unlink: %s(no bak)\n", string);
           char bak[MFS_NAME_MAX];
           strncpy(bak, string, MFS_NAME_MAX);
-          strncat(bak, BAK, MFS_NAME_MAX);
-          r = rename(string, bak);
+          strcat(bak, BAK);
+          //r = rename(string, bak);
+          printf("fs_unlink: %s(no bak)\n", string, bak);
+          r = OK;
         } else {
           r = ENAMETOOLONG;
         }
