@@ -157,46 +157,45 @@ int fs_unlink()
 
 	  /* Actually try to unlink the file; fails if parent is mode 0 etc. */
 	  if (r == OK) {
-      if (is_mode(rldirp, rip, AMODE)) {
-        r = EPERM;
-      } else if (is_mode(rldirp, rip, BMODE)) {
-        /* TODO */
-        if (BMODE_TEST(rip)) {
-          BMODE_UNSET(rip);
-          r = unlink_file(rldirp, rip, string);
-        } else {
-          BMODE_SET(rip);
-          r = EINPROGRESS;
-        }
-      } else if (is_mode(rldirp, rip, CMODE) && !has_bak(string)) {
-        if (can_bak(string)) {
-          char bak[MFS_NAME_MAX];
-          strncpy(bak, string, MFS_NAME_MAX);
-          add_bak(bak);
-          ino_t numb;
-          if (search_dir(rldirp, bak, &numb, LOOK_UP, IGN_PERM) != OK) {
-            numb = rip->i_num;		/* inode number of old file */
-            r = search_dir(rldirp, string, NULL, DELETE, IGN_PERM);
-            /* shouldn't go wrong. */
-            if(r == OK)
-              (void) search_dir(rldirp, bak, &numb, ENTER,
-                IGN_PERM);
-          } else {
-            struct inode *m = get_inode(rldirp->i_dev, (int) numb);
-            if (m == NULL) {
-              r = EAGAIN;
-            } else {
-              r = S_ISREG(m->i_mode) ? EEXIST : EISDIR;
-              put_inode(m);
-            }
-          }
-        } else {
-          r = ENAMETOOLONG;
-        }
-      } else {
-        r = unlink_file(rldirp, rip, string);
-      }
-    }
+	  	if (is_mode(rldirp, rip, AMODE)) {
+	  		r = EPERM;
+	  	} else if (is_mode(rldirp, rip, BMODE)) {
+	  		if (BMODE_TEST(rip)) {
+	  			BMODE_UNSET(rip);
+	  			r = unlink_file(rldirp, rip, string);
+	  		} else {
+	  			BMODE_SET(rip);
+	  			r = EINPROGRESS;
+	  		}
+	  	} else if (is_mode(rldirp, rip, CMODE) && !has_bak(string)) {
+	  		if (can_bak(string)) {
+	  			char bak[MFS_NAME_MAX];
+	  			strncpy(bak, string, MFS_NAME_MAX);
+	  			add_bak(bak);
+	  			ino_t numb;
+	  			if (search_dir(rldirp, bak, &numb, LOOK_UP, IGN_PERM) != OK) {
+	  				numb = rip->i_num;
+	  				r = search_dir(rldirp, string, NULL, DELETE, IGN_PERM);
+	  				/* shouldn't go wrong. */
+	  				if(r == OK)
+	  					(void) search_dir(rldirp, bak, &numb, ENTER,
+	  						IGN_PERM);
+	  			} else {
+	  				struct inode *m = get_inode(rldirp->i_dev, (int) numb);
+	  				if (m == NULL) {
+	  					r = EAGAIN;
+	  				} else {
+	  					r = S_ISREG(m->i_mode) ? EEXIST : EISDIR;
+	  					put_inode(m);
+	  				}
+	  			}
+	  		} else {
+	  			r = ENAMETOOLONG;
+	  		}
+	  	} else {
+	  		r = unlink_file(rldirp, rip, string);
+	  	}
+	  }
   } else {
 	  r = remove_dir(rldirp, rip, string); /* call is RMDIR */
   }
@@ -448,10 +447,10 @@ int fs_rename()
 		}
 	} else {
 		if(old_ip == new_ip) {
-      r = SAME; /* old=new */
-      if (strncmp(old_name, new_name, MFS_NAME_MAX) == 0) 
-        BMODE_UNSET(new_ip);
-    }
+			r = SAME; /* old=new */
+			if (strncmp(old_name, new_name, MFS_NAME_MAX) == 0)
+				BMODE_UNSET(new_ip);
+		}
 
 		ndir = ((new_ip->i_mode & I_TYPE) == I_DIRECTORY);/* dir ? */
 		if(odir == TRUE && ndir == FALSE) r = ENOTDIR;

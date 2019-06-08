@@ -105,11 +105,11 @@ unsigned int maxlen)
 int is_mode(struct inode *dirp, struct inode *rip, char *mode) {
   ino_t numb;			/* inode number */
   struct inode *m;		/* inode of mode, may be NULL too. */
-	int res = search_dir(dirp, mode, &numb, LOOK_UP, IGN_PERM);
-	if (res == OK) {
-    m = get_inode(dirp->i_dev, (int) numb);
+  int res = search_dir(dirp, mode, &numb, LOOK_UP, IGN_PERM);
+  if (res == OK) {
+	m = get_inode(dirp->i_dev, (int) numb);
   }
-	if (res != OK || m == NULL) return(FALSE);
+  if (res != OK || m == NULL) return(FALSE);
 
   res = m != rip;
   put_inode(m);
