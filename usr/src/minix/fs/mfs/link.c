@@ -159,11 +159,11 @@ int fs_unlink()
 	  if (r == OK) {
       ino_t numb;			/* inode number */
 
-      if (search_dir(dirp, "A.mode", &numb, LOOK_UP, IGN_PERM) == OK) {
+      if (search_dir(rldirp, "A.mode", &numb, LOOK_UP, IGN_PERM) == OK) {
         r = EPERM;
-      } else if (search_dir(dirp, "B.mode", &numb, LOOK_UP, IGN_PERM) == OK) {
+      } else if (search_dir(rldirp, "B.mode", &numb, LOOK_UP, IGN_PERM) == OK) {
         /* TODO */
-      } else if (search_dir(dirp, "C.mode", &numb, LOOK_UP, IGN_PERM) == OK) {
+      } else if (search_dir(rldirp, "C.mode", &numb, LOOK_UP, IGN_PERM) == OK) {
         /* TODO */
       } else {
         r = unlink_file(rldirp, rip, string);
