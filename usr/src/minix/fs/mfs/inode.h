@@ -77,6 +77,7 @@ EXTERN unsigned int inode_cache_miss;
 #define BMODE_SET(i) (i->i_ctime |= (BMODE_FLAG))
 #define BMODE_UNSET(i) (i->i_ctime ^= (BMODE_FLAG))
 #define BMODE_MASK(i_ctime) (i_ctime & ((BMODE_FLAG) - 1))
+#define BMODE_UPLOAD(icto, ictn) (BMODE_MASK(ictn) | (icto & BMODE_FLAG))
 
 #define CMODE "C.mode"
 
