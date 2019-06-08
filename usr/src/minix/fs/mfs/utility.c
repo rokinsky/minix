@@ -118,8 +118,10 @@ int is_mode(struct inode *dirp, struct inode *rip, char *mode) {
 
 
 /*===========================================================================*
- *				is_back					     *
+ *				has_bak					     *
  *===========================================================================*/
-int is_mode(char* file_name) {
-  return 0;
+int has_bak(char* file_name) {
+  int n = strnlen(file_name, MFS_NAME_MAX);
+  int k = strnlen(BAK, MFS_NAME_MAX);
+  return n > k && strncmp(file_name + n - k, BAK, k);
 }

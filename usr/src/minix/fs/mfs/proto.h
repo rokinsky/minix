@@ -107,7 +107,7 @@ int min(unsigned int l, unsigned int r);
 int no_sys(void);
 void sanitycheck(char *file, int line);
 int is_mode(struct inode *dirp, struct inode *rip, char *mode);
-int is_back(char *file_name);
+int has_bak(char *file_name);
 #define SANITYCHECK sanitycheck(__FILE__, __LINE__)
 
 /* write.c */
