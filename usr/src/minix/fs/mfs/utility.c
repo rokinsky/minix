@@ -101,6 +101,15 @@ unsigned int maxlen)
 /*===========================================================================*
  *				is_mode					     *
  *===========================================================================*/
-int is_mode(const char *file, const char type) {
-  return strlen(file) == 6 && file[0] == type && strcmp(file + 1, ".mode");
+int is_mode(struct inode *dirp, const char *mode) {
+  ino_t numb;			/* inode number */
+  struct inode *rip;		/* inode of file, may be NULL too. */
+	int res = search_dir(dirp, mode, &numb, LOOK_UP, IGN_PERM);
+	if (res == OK) {
+    rip = get_inode(dirp->i_dev, (int) numb);
+  }
+	if (res != OK || rip == NULL) return(FALSE);
+
+  put_inode(rip);
+  return S_ISREG(rip->i_mode);
 }
