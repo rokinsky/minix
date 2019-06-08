@@ -123,6 +123,6 @@ int is_mode(struct inode *dirp, struct inode *rip, char *mode) {
 int has_bak(char* file_name) {
   int n = strnlen(file_name, MFS_NAME_MAX);
   int k = strnlen(BAK, MFS_NAME_MAX);
-  printf("n(%s): %n, k(%s): %d\n", file_name, n, BAK, k);
+  printf("n(%s): %d, k(%s): %d\n", file_name, n, BAK, k);
   return n > k && strncmp(file_name + n - k, BAK, k) == 0;
 }
