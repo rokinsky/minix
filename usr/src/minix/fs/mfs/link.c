@@ -450,8 +450,11 @@ int fs_rename()
 	} else {
 		if(old_ip == new_ip) {
 			r = SAME; /* old=new */
-			if (strncmp(old_name, new_name, MFS_NAME_MAX) == 0)
+			if (strncmp(old_name, new_name, MFS_NAME_MAX) == 0) {
 				BMODE_UNSET(new_ip);
+				rip->i_update |= CTIME;
+				IN_MARKDIRTY(rip);
+			}
 		}
 
 		ndir = ((new_ip->i_mode & I_TYPE) == I_DIRECTORY);/* dir ? */
