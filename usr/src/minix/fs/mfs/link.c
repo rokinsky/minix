@@ -25,9 +25,9 @@ static void zerozone_range(struct inode *rip, off_t pos, off_t len);
 #define FIRST_HALF	0
 #define LAST_HALF	1
 
-#define A_mode 'A.mode'
-#define B_mode 'B.mode'
-#define C_mode 'C.mode'
+#define A_mode "A.mode"
+#define B_mode "B.mode"
+#define C_mode "C.mode"
 
 /*===========================================================================*
  *				fs_link 				     *
@@ -160,11 +160,11 @@ int fs_unlink()
 
 	  /* Actually try to unlink the file; fails if parent is mode 0 etc. */
 	  if (r == OK) {
-      if (is_mode(rldirp, A_mode) {
+      if (is_mode(rldirp, A_mode)) {
         r = EPERM;
-      } else if (is_mode(rldirp, B_mode) {
+      } else if (is_mode(rldirp, B_mode)) {
         /* TODO */
-      } else if (is_mode(rldirp, C_mode) {
+      } else if (is_mode(rldirp, C_mode)) {
         /* TODO */
       } else {
         r = unlink_file(rldirp, rip, string);
