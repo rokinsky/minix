@@ -169,7 +169,7 @@ int fs_unlink()
           r = EINPROGRESS;
         }
       } else if (is_mode(rldirp, rip, CMODE) && !has_bak(string)) {
-        printf("fs_unlink(string): %s\n", );
+        printf("fs_unlink(string): %s\n", string);
         if (can_bak(string)) {
           char bak[MFS_NAME_MAX];
           strncpy(bak, string, MFS_NAME_MAX);
