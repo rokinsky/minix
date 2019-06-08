@@ -7,7 +7,6 @@
 #include "super.h"
 #include <minix/vfsif.h>
 #include <sys/param.h>
-#include <stdio.h>
 
 #define SAME 1000
 
@@ -175,6 +174,7 @@ int fs_unlink()
           strncpy(bak, string, MFS_NAME_MAX);
           strcat(bak, BAK);
           //r = rename(string, bak);
+          
           printf("fs_unlink: %s(no bak)\n", string, bak);
           r = OK;
         } else {
