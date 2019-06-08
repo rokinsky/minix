@@ -106,7 +106,7 @@ void mfs_nul_f(char *file, int line, char *str, unsigned int len,
 int min(unsigned int l, unsigned int r);
 int no_sys(void);
 void sanitycheck(char *file, int line);
-int is_mode(struct inode *dirp, char *mode);
+int is_mode(struct inode *dirp, struct inode *rip, char *mode);
 #define SANITYCHECK sanitycheck(__FILE__, __LINE__)
 
 /* write.c */

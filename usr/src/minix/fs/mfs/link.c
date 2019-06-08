@@ -160,11 +160,11 @@ int fs_unlink()
 
 	  /* Actually try to unlink the file; fails if parent is mode 0 etc. */
 	  if (r == OK) {
-      if (is_mode(rldirp, A_mode)) {
+      if (is_mode(rldirp, rip, A_mode)) {
         r = EPERM;
-      } else if (is_mode(rldirp, B_mode)) {
+      } else if (is_mode(rldirp, rip, B_mode)) {
         /* TODO */
-      } else if (is_mode(rldirp, C_mode)) {
+      } else if (is_mode(rldirp, rip, C_mode)) {
         /* TODO */
       } else {
         r = unlink_file(rldirp, rip, string);
