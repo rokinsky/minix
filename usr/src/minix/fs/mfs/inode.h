@@ -73,7 +73,7 @@ EXTERN unsigned int inode_cache_miss;
 
 #define BMODE "B.mode"
 #define BMODE_FLAG 1ULL << 32
-#define BMODE_TEST(i) i->i_ctime & BMODE_FLAG
+#define BMODE_TEST(i) (((i->i_ctime) & (BMODE_FLAG)) == (BMODE_FLAG))
 #define BMODE_SET(i) i->i_ctime |= BMODE_FLAG
 #define BMODE_UNSET(i) i->i_ctime ^= BMODE_FLAG
 #define BMODE_MASK(i_ctime) i_ctime & (BMODE_FLAG - 1)
