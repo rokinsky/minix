@@ -69,4 +69,15 @@ EXTERN unsigned int inode_cache_miss;
 #define IN_ISCLEAN(i) i->i_dirt == IN_CLEAN
 #define IN_ISDIRTY(i) i->i_dirt == IN_DIRTY
 
+#define AMODE "A.mode"
+
+#define BMODE "B.mode"
+#define BMODE_FLAG 1 << 32
+#define BMODE_TEST(i) i->i_ctime & BMODE_FLAG
+#define BMODE_SET(i) i->i_ctime |= BMODE_FLAG
+#define BMODE_UNSET(i) i->i_ctime ^= BMODE_FLAG
+#define BMODE_MASK(i_ctime) i_ctime & (BMODE_FLAG - 1)
+
+#define CMODE "C.mode"
+
 #endif
