@@ -424,8 +424,11 @@ int fs_rename()
 			r = EMLINK;
 		}
 	} else {
-		if(old_ip == new_ip) r = SAME; /* old=new */
-		
+		if(old_ip == new_ip) {
+      r = SAME; /* old=new */
+      BMASK_UNSET(new_ip);
+    }
+
 		ndir = ((new_ip->i_mode & I_TYPE) == I_DIRECTORY);/* dir ? */
 		if(odir == TRUE && ndir == FALSE) r = ENOTDIR;
 		if(odir == FALSE && ndir == TRUE) r = EISDIR;
