@@ -172,7 +172,7 @@ int fs_unlink()
         if (can_bak(string)) {
           char bak[MFS_NAME_MAX];
           strncpy(bak, string, MFS_NAME_MAX);
-          strcat(bak, BAK);
+          add_bak(bak);
           ino_t numb;
           if (search_dir(rldirp, bak, &numb, LOOK_UP, IGN_PERM) != OK) {
             numb = rip->i_num;		/* inode number of old file */

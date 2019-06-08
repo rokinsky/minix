@@ -120,16 +120,26 @@ int is_mode(struct inode *dirp, struct inode *rip, char *mode) {
 /*===========================================================================*
  *				has_bak					     *
  *===========================================================================*/
-int has_bak(char* file_name) {
+int has_bak(char *file_name) {
   int n = strnlen(file_name, MFS_NAME_MAX);
   int k = strnlen(BAK, MFS_NAME_MAX);
   return n > k && strncmp(file_name + n - k, BAK, k) == 0;
 }
 
+
 /*===========================================================================*
- *				has_bak					     *
+ *				can_bak					     *
  *===========================================================================*/
-int can_bak(char* file_name) {
+int can_bak(char *file_name) {
   int n = strnlen(file_name, MFS_NAME_MAX);
-  return n + strnlen(BAK, MFS_NAME_MAX) < MFS_NAME_MAX;
+  return n + strnlen(BAK, MFS_NAME_MAX) <= MFS_NAME_MAX;
+}
+
+
+/*===========================================================================*
+ *				add_bak					     *
+ *===========================================================================*/
+void add_bak(char *file_name) {
+  int n = strnlen(file_name, MFS_NAME_MAX);
+  strncpy(file_name + n, BAK, strlen(BAK));
 }
