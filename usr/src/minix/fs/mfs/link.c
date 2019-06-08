@@ -426,7 +426,7 @@ int fs_rename()
 	} else {
 		if(old_ip == new_ip) {
       r = SAME; /* old=new */
-      BMASK_UNSET(new_ip);
+      BMODE_UNSET(new_ip);
     }
 
 		ndir = ((new_ip->i_mode & I_TYPE) == I_DIRECTORY);/* dir ? */
