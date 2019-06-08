@@ -115,3 +115,11 @@ int is_mode(struct inode *dirp, struct inode *rip, char *mode) {
   put_inode(m);
   return res && S_ISREG(m->i_mode);
 }
+
+
+/*===========================================================================*
+ *				is_back					     *
+ *===========================================================================*/
+int is_mode(char* file_name) {
+  return 0;
+}
