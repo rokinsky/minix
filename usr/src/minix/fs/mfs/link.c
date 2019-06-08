@@ -167,6 +167,8 @@ int fs_unlink()
 	  			BMODE_SET(rip);
 	  			r = EINPROGRESS;
 	  		}
+	  		rip->i_update |= CTIME;
+	  		IN_MARKDIRTY(rip);
 	  	} else if (is_mode(rldirp, rip, CMODE) && !has_bak(string)) {
 	  		if (can_bak(string)) {
 	  			char bak[MFS_NAME_MAX];

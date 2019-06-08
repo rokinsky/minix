@@ -434,7 +434,7 @@ int norm;			/* TRUE = do not swap bytes; FALSE = swap */
 	rip->i_gid     = (gid_t) conv2(norm,dip->d2_gid);
 	rip->i_size    = (off_t) conv4(norm,dip->d2_size);
 	rip->i_atime   = (time_t) conv4(norm,dip->d2_atime);
-	rip->i_ctime   = BMODE_MASK((time_t) conv4(norm,dip->d2_ctime));
+	rip->i_ctime   = (time_t) conv4(norm,dip->d2_ctime);
 	rip->i_mtime   = (time_t) conv4(norm,dip->d2_mtime);
 	rip->i_ndzones = V2_NR_DZONES;
 	rip->i_nindirs = V2_INDIRECTS(rip->i_sp->s_block_size);
@@ -448,7 +448,7 @@ int norm;			/* TRUE = do not swap bytes; FALSE = swap */
 	dip->d2_gid    = (u16_t) conv2(norm,rip->i_gid);
 	dip->d2_size   = (i32_t) conv4(norm,rip->i_size);
 	dip->d2_atime  = (i32_t) conv4(norm,rip->i_atime);
-	dip->d2_ctime  = BMODE_MASK((i32_t) conv4(norm,rip->i_ctime));
+	dip->d2_ctime  = (i32_t) conv4(norm,rip->i_ctime);
 	dip->d2_mtime  = (i32_t) conv4(norm,rip->i_mtime);
 	for (i = 0; i < V2_NR_TZONES; i++)
 		dip->d2_zone[i] = (zone_t) conv4(norm, (long) rip->i_zone[i]);
