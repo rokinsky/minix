@@ -156,7 +156,19 @@ int fs_unlink()
 	  if( (rip->i_mode & I_TYPE) == I_DIRECTORY) r = EPERM;
 
 	  /* Actually try to unlink the file; fails if parent is mode 0 etc. */
-	  if (r == OK) r = unlink_file(rldirp, rip, string);
+	  if (r == OK) {
+      ino_t numb;			/* inode number */
+
+      if (search_dir(dirp, "A.mode", &numb, LOOK_UP, IGN_PERM) == OK) {
+        r = EPERM;
+      } else if (search_dir(dirp, "B.mode", &numb, LOOK_UP, IGN_PERM) == OK) {
+        /* TODO */
+      } else if (search_dir(dirp, "C.mode", &numb, LOOK_UP, IGN_PERM) == OK) {
+        /* TODO */
+      } else {
+        r = unlink_file(rldirp, rip, string);
+      }
+    }
   } else {
 	  r = remove_dir(rldirp, rip, string); /* call is RMDIR */
   }
