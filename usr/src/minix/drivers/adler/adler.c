@@ -4,9 +4,9 @@
 #include <stdlib.h>
 #include <minix/ds.h>
 
-#define ADLER_SIZE 16
-#define ADLER_MESSAGE "ADLER32!\n"
+#define ADLER_SIZE 1024
 #define ADLER_N 8
+#define ADLER_MESSAGE "ADLER32!\n"
 
 /*
  * Function prototypes for the adler driver.
@@ -50,7 +50,7 @@ uint32_t adler_get()
     return (B << 16) + A;
 }
 
-void adler_count(const char* buf, size_t buf_length)
+void adler_count(const unsigned char *buf, size_t buf_length)
 {
     while (buf_length--) {
         A = (A + *(buf++)) % 65521;
@@ -69,17 +69,14 @@ static int adler_close(devminor_t UNUSED(minor))
     return OK;
 }
 
-static ssize_t adler_read(devminor_t UNUSED(minor), u64_t /*UNUSED*/position,
+static ssize_t adler_read(devminor_t UNUSED(minor), u64_t UNUSED(position),
     endpoint_t endpt, cp_grant_id_t grant, size_t size, int UNUSED(flags),
     cdev_id_t UNUSED(id))
 {
     int ret;
     char hash[ADLER_N + 1];
 
-    printf("adler_read()\n");
-
     if (size < ADLER_N) return EINVAL;
-    printf("size: %d, position: %llu\n", size, position);
 
     snprintf(hash, ADLER_N + 1, "%08x", adler_get());
     if ((ret = sys_safecopyto(endpt, grant, 0, (vir_bytes) hash, ADLER_N)) != OK)
@@ -89,21 +86,16 @@ static ssize_t adler_read(devminor_t UNUSED(minor), u64_t /*UNUSED*/position,
     return ADLER_N;
 }
 
-static ssize_t adler_write(devminor_t UNUSED(minor), u64_t /*UNUSED*/position,
+static ssize_t adler_write(devminor_t UNUSED(minor), u64_t UNUSED(position),
     endpoint_t endpt, cp_grant_id_t grant, size_t size, int UNUSED(flags),
     cdev_id_t UNUSED(id))
 {
     int ret;
-    char buf[ADLER_SIZE + 1];
-    printf("adler_write()\n");
-    printf("before size: %d, position: %llu\n", size, position);
+    unsigned char buf[ADLER_SIZE + 1];
 
-    size = size > ADLER_SIZE ? ADLER_SIZE : size;
+    size = MIN(size, ADLER_SIZE);
     if ((ret = sys_safecopyfrom(endpt, grant, 0, (vir_bytes) buf, size)) != OK)
         return ret;
-
-    printf("after size: %d, position: %llu\n", size, 0);
-    printf("buffer: %.*s\n", size, buf);
 
     adler_count(buf, size);
     /* Return the number of bytes read. */
