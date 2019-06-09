@@ -78,13 +78,22 @@ static ssize_t adler_read(devminor_t UNUSED(minor), u64_t position,
     endpoint_t endpt, cp_grant_id_t grant, size_t size, int UNUSED(flags),
     cdev_id_t UNUSED(id))
 {
-    u64_t dev_size;
-    char *ptr;
     int ret;
-    char *buf = buffer;
+    char hash[8];
 
     printf("adler_read()\n");
 
+    if (size < 8) return EINVAL;
+
+    snprintf(hash, 8, "%x", adler_get());
+    if ((ret = sys_safecopyto(endpt, grant, 0, (vir_bytes) hash, 8)) != OK)
+        return ret;
+
+    return 8;
+
+    char *ptr;
+    u64_t dev_size;
+    char *buf = buffer;
     /* This is the total size of our device. */
     dev_size = (u64_t) ADLER_SIZE;
 
