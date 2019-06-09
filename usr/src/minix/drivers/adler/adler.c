@@ -53,7 +53,7 @@ uint32_t adler_get()
     return hash;
 }
 
-uint32_t adler_count(const char* buf, size_t buf_length)
+void adler_count(const char* buf, size_t buf_length)
 {
     while( buf_length-- ) {
         A = (A + *( buf++ )) % 65521;
@@ -79,17 +79,18 @@ static ssize_t adler_read(devminor_t UNUSED(minor), u64_t position,
     cdev_id_t UNUSED(id))
 {
     int ret;
-    char hash[8];
+    char hash[10];
 
     printf("adler_read()\n");
 
     if (size < 8) return EINVAL;
 
-    snprintf(hash, 8, "%x", adler_get());
-    if ((ret = sys_safecopyto(endpt, grant, 0, (vir_bytes) hash, 8)) != OK)
+    snprintf(hash, 10, "%08x", adler_get());
+    hash[10] = '\0';
+    if ((ret = sys_safecopyto(endpt, grant, 0, (vir_bytes) hash, 10)) != OK)
         return ret;
 
-    return 8;
+    return 10;
 
     char *ptr;
     u64_t dev_size;
