@@ -37,6 +37,29 @@ static struct chardriver adler_tab =
  */
 static int open_counter;
 static char buffer[ADLER_SIZE + 1]; // +1 for \0 for strlen
+static uint32_t A;
+static uint32_t B;
+
+void adler_reset()
+{
+    A = 1;
+    B = 0;
+}
+
+uint32_t adler_get()
+{
+    uint32_t hash = (B << 16) + A;
+    adler_reset();
+    return hash;
+}
+
+uint32_t adler_count(const char* buf, size_t buf_length)
+{
+    while( buf_length-- ) {
+        A = (A + *( buf++ )) % 65521;
+        B = (B + A) % 65521;
+    }
+}
 
 static int adler_open(devminor_t UNUSED(minor), int UNUSED(access),
     endpoint_t UNUSED(user_endpt))
@@ -158,6 +181,7 @@ static int sef_cb_init(int type, sef_init_info_t *UNUSED(info))
     memset(buffer, (int) 'a', ADLER_SIZE);
     buffer[ADLER_SIZE] = '\0';
     open_counter = 0;
+    adler_reset();
     switch(type) {
         case SEF_INIT_FRESH:
             printf("%s", ADLER_MESSAGE);
