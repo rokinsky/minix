@@ -6,7 +6,6 @@
 
 #define ADLER_SIZE 1024
 #define ADLER_N 8
-#define ADLER_MESSAGE "ADLER32!\n"
 
 /*
  * Function prototypes for the adler driver.
@@ -152,19 +151,15 @@ static int sef_cb_init(int type, sef_init_info_t *UNUSED(info))
     adler_reset();
     switch(type) {
         case SEF_INIT_FRESH:
-            printf("%s", ADLER_MESSAGE);
         break;
 
         case SEF_INIT_LU:
             /* Restore the state. */
             lu_state_restore();
             do_announce_driver = FALSE;
-
-            printf("%sHey, I'm a new version!\n", ADLER_MESSAGE);
         break;
 
         case SEF_INIT_RESTART:
-            printf("%sHey, I've just been restarted!\n", ADLER_MESSAGE);
         break;
     }
 
