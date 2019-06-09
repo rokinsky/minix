@@ -8,6 +8,13 @@
 #define ADLER_N 8
 
 /*
+ * Adler32 algorithm function prototypes.
+ */
+static void adler_reset();
+static u32_t adler_get();
+static void adler_count(const unsigned char *buf, size_t buf_length);
+
+/*
  * Function prototypes for the adler driver.
  */
 static int adler_open(devminor_t minor, int access, endpoint_t user_endpt);
@@ -32,24 +39,22 @@ static struct chardriver adler_tab =
     .cdr_write  = adler_write,
 };
 
-/** State variable to count the number of times the device has been opened.
- * Note that this is not the regular type of open counter: it never decreases.
- */
-static uint32_t A;
-static uint32_t B;
+/* State variables. */
+static u32_t A;
+static u32_t B;
 
-void adler_reset()
+static void adler_reset()
 {
     A = 1;
     B = 0;
 }
 
-uint32_t adler_get()
+static u32_t adler_get()
 {
     return (B << 16) + A;
 }
 
-void adler_count(const unsigned char *buf, size_t buf_length)
+static void adler_count(const unsigned char *buf, size_t buf_length)
 {
     while (buf_length--) {
         A = (A + *(buf++)) % 65521;
